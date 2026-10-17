@@ -1,5 +1,117 @@
 # Afterglow — Changelog
 
+## 0.10.0 — Wet-Return Ducking and Stacked Panels — 17 October 2026
+
+### Added
+
+- Added smoothed, host-automatable Duck Amount from 0% to 100%.
+- Added Duck Attack from 1 to 500 ms and Duck Release from 20 to 3000 ms.
+- Added a stereo-linked peak envelope driven by the main dry input.
+- Added a dedicated lower Ducking panel containing DUCK, ATTACK and RELEASE.
+
+### Changed
+
+- Applied ducking only to the audible wet return after stereo Spread and output safety processing. The dry path and internal feedback signal are not attenuated, so delay tails continue regenerating while ducked.
+- Restored FDBK, CROSS and SPREAD to one horizontal row inside a reduced-height upper panel aligned with Hi Cut.
+- Aligned the matching DUCK, ATTACK and RELEASE panel with Lo Cut.
+- Moved both Time knobs and every other upper-row knob up four pixels while leaving all lower-row knobs in place.
+- Centred Link L/R under Left Time and Tempo Sync under Right Time.
+- Increased the fixed interface width to 824 pixels while preserving matching six-pixel coloured margins at both sides.
+- Advanced the state schema to version 11 and updated all project metadata to 0.10.0.
+
+### Performance and safety
+
+- Kept duck detector and gain processing allocation-free inside `processBlock`.
+- Smoothed the amount and time-derived envelope coefficients for click-resistant automation.
+- Sanitised and bounded the detector envelope and final duck gain.
+
+### Compatibility
+
+- This early-development release intentionally ignores state written by 0.9.0 and older builds. Insert a fresh 0.10.0 instance.
+
+## 0.9.0 — Knob Timing and Ghost Mode — 17 October 2026
+
+### Added
+
+- Added Ghost as a genuine fifth delay algorithm rather than a menu-only variation.
+- Added a four-stage quadrature network and efficient recursive oscillator for opposite left/right frequency shifting.
+- Added independent Ghost filtering, saturation, continuous delay movement and feedback-path processing.
+- Added a purple Ghost interface colour and contextual description.
+
+### Changed
+
+- Removed the separate Left and Right Note combo boxes.
+- Made both Time knobs attach directly to millisecond parameters with Tempo Sync off and note-division parameters with Tempo Sync on.
+- Preserved all four independent timing values—left/right milliseconds and left/right divisions—when switching Sync or Link.
+- Changed the timing divider dynamically between `L — TIME — R` and `L — NOTE — R`.
+- Aligned the two Time knobs with the upper Hi Cut row.
+- Reflowed FDBK and CROSS onto the upper row with SPREAD centred beneath them.
+- Reduced the feedback panel and overall interface width while keeping Dry/Wet–Output at the far right.
+- Corrected the coloured frame so the control panels have matching six-pixel left and right insets.
+- Added `ms` to the free-time knob value displays.
+- Reordered synced divisions from shortest to longest so clockwise knob movement always increases delay time.
+- Advanced the state schema to version 10 and updated all project metadata to 0.9.0.
+
+### Performance and safety
+
+- Kept Ghost processing allocation-free inside `processBlock`.
+- Used a recursive quadrature oscillator with periodic normalisation instead of per-sample trigonometric calls.
+- Retained finite-value sanitisation, smoothed mode transitions, controlled feedback saturation and output safety limiting.
+
+### Compatibility
+
+- This early-development release intentionally ignores state written by 0.8.0 and older builds. Insert a fresh 0.9.0 instance.
+
+## 0.8.0 — Stereo Spread and Timing Clarity — 17 October 2026
+
+### Added
+
+- Added a smoothed, host-automatable bipolar Spread control from -100% to +100% with a centre detent and double-click reset.
+- Added a dedicated FDBK–CROSS–SPREAD panel.
+- Added mode-coloured panel backgrounds: Digital blue, Tape green, BBD red and HiFi orange.
+
+### Changed
+
+- Applied Spread to the audible wet mid/side image after the feedback path, preserving Cross timing and regeneration while controlling stereo extent.
+- Made timing ownership explicit: millisecond knobs are active only with Tempo Sync off, and Note selectors are active only with Tempo Sync on.
+- Preserved both free-time and synced right-channel settings through Link L/R changes.
+- Removed the `STEREO DELAY / sl23` subtitle and moved the Mode selector into that header position.
+- Moved Dry/Wet–Output to the rightmost panel to reflect its final position in the audible signal chain.
+- Kept Hi Cut above Lo Cut and widened the fixed interface by 22 pixels to maintain even panel spacing.
+- Advanced the state schema to version 9 and updated all project metadata to 0.8.0.
+
+### Fixed
+
+- Added a 100 ms same-direction event guard to each combo box, preventing duplicate operating-system wheel events from producing two-item jumps while retaining immediate first-notch response.
+
+### Compatibility
+
+- This early-development release intentionally ignores state written by 0.7.1 and older builds. Insert a fresh 0.8.0 instance.
+
+## 0.7.1 — Audible Mode Character and Wheel Fix — 17 October 2026
+
+### Fixed
+
+- Corrected Digital, Tape and HiFi sounding almost identical when Drive, Age, Wow and Flutter were low.
+- Strengthened BBD's inherent identity so it is clearly darker and grainier without relying on extreme Age settings.
+- Replaced JUCE's accumulated combo-box wheel behavior, which could ignore the first movement or jump two items, with exactly one item change per wheel event.
+- Reset only the newly selected mode's private filter/read-head memory during a switch, preventing stale inactive state from reappearing while preserving the shared delay tail.
+
+### Changed
+
+- Kept Digital as the clean, stable reference path.
+- Added inherent two-stage head loss, soft saturation and delay-dependent drift to Tape.
+- Added stronger two-stage, delay-dependent bandwidth loss, coarser clock resolution, compander texture and saturation to BBD.
+- Added restrained bandwidth shaping, gentle saturation, asperity and smaller reel-to-reel drift to HiFi.
+- Smoothed Age before using it for nonlinear mode character.
+- Reduced analogue-mode feedback headroom progressively from HiFi through Tape to BBD so their differences accumulate naturally across echoes.
+- Swapped the filter control positions so Hi Cut is above Lo Cut.
+- Advanced the state schema to version 8 and updated all project metadata to 0.7.1.
+
+### Compatibility
+
+- This early-development release intentionally ignores state written by 0.7.0 and older builds. Insert a fresh 0.7.1 instance.
+
 ## 0.7.0 — HiFi Mode and Grouped Interface — 17 October 2026
 
 ### Added

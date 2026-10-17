@@ -1,6 +1,6 @@
-# Afterglow 0.7.0
+# Afterglow 0.10.0
 
-Afterglow is an early-development stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 0.7.0 adds a full-bandwidth HiFi studio-tape mode, extends Tempo Sync to 1/64, preserves independent right-channel timing while linked and reorganises related controls into compact panels.
+Afterglow is an early-development stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 0.10.0 adds a dedicated wet-return ducker and reorganises the centre controls into compact stacked Feedback and Ducking panels.
 
 ## Build and installation
 
@@ -22,24 +22,33 @@ Uses dual read-head crossfades when the delay time changes. This avoids intentio
 
 ### Tape
 
-Uses a continuously moving read head when the delay time changes. Time changes therefore glide in pitch, while Age progressively narrows the repeat bandwidth.
+Uses a continuously moving read head, delay-time-dependent drift, two-stage high-frequency head loss and soft tape saturation. Age progressively increases bandwidth wear and compression.
 
 ### HiFi
 
-Uses continuous varispeed delay movement like a studio reel-to-reel delay, but retains a bright full-bandwidth signal path. Age adds restrained asperity texture without Tape mode's narrowing filters or BBD companding.
+Uses continuous varispeed delay movement like a studio reel-to-reel delay, while remaining much brighter and cleaner than Tape. Gentle inherent saturation and drift distinguish it from Digital; Age adds restrained bandwidth wear and asperity texture.
 
 ### BBD
 
-Models a dark bucket-brigade delay with continuous pitch-changing time movement, delay- and Age-dependent bandwidth, companding, progressively coarser clock resolution, signal-tracking noise and its own controlled feedback saturation.
+Models a deliberately dark bucket-brigade delay with two-stage, delay-dependent bandwidth loss, continuous clock movement, companding, progressively coarser resolution, signal-tracking noise and stronger controlled saturation.
+
+### Ghost
+
+Uses a continuously moving analogue-style delay feeding a quadrature frequency shifter. The left and right repeats shift in opposite directions, and the spectral displacement accumulates naturally through the feedback loop. Age progressively darkens and saturates the shifted repeats.
 
 ## Controls
 
 - Independent Left and Right delay times from 1 to 2000 ms.
-- Link L/R makes the disabled Right Time and Right Note controls visually follow the left controls without overwriting their independent parameter values. Turning Link off restores the previous right-channel settings.
-- Tempo Sync with separate Left and Right musical divisions, including straight, dotted and triplet values through 1/64.
-- Every combo box supports mouse-wheel selection.
+- Link L/R makes the disabled Right Time knob visually follow the left knob without overwriting its independent millisecond or note-division value. Turning Link off restores the previous right-channel setting for the active timing mode.
+- With Tempo Sync off, the two Time knobs display and edit milliseconds.
+- With Tempo Sync on, those same two knobs display and edit musical note divisions. Separate straight, dotted and triplet choices are available through 1/64 and are ordered from shortest to longest so clockwise movement remains consistent with millisecond mode.
+- Switching Tempo Sync never converts or overwrites values: the stored millisecond and note settings are independent and return when their timing mode is selected again.
+- The remaining Mode combo box suppresses duplicate wheel events so one physical wheel movement advances exactly one item from the first movement.
 - Link L/R and Tempo Sync use clear LED status indicators rather than checkbox graphics.
 - Feedback from 0% to 200% and continuously variable Cross Feedback.
+- Bipolar Spread from -100% to +100% controls delayed-signal width without changing the Cross-feedback rhythm: 0% centres the repeats, +100% gives full width and negative values reverse their left/right placement. It has a centre detent and double-click reset to 0%.
+- Duck from 0% to 100% reduces only the audible wet return while new input is present. The dry signal and internal feedback regeneration remain untouched, so repeats recover naturally instead of being erased from the delay loop.
+- Duck Attack ranges from 1 to 500 ms and Duck Release from 20 to 3000 ms. A stereo-linked peak envelope prevents the delayed image from shifting sideways while it ducks.
 - 0-100% Feedback produces progressively more repeats; 100-200% enters controlled regeneration and self-oscillation.
 - Static soft limiting and Feedback-position gain compensation keep regenerative output controlled without envelope detection or compressor pumping.
 - Dry/Wet balance and Output gain.
@@ -47,12 +56,60 @@ Models a dark bucket-brigade delay with continuous pitch-changing time movement,
 - Double-clicking Dry/Wet returns it directly to its centred 50% value.
 - Low Cut and High Cut applied to every echo, including the first.
 - Drive applies an intentionally audible, level-compensated soft clip once as new audio enters the delay. Recirculating repeats are never re-driven.
-- Wow and Flutter available in Digital and Tape modes.
-- Age controls bandwidth wear in Tape, bandwidth/compander texture in BBD, and restrained asperity texture in HiFi. It is disabled only in Digital mode.
+- Wow and Flutter add user-controlled movement in every mode. Tape, BBD and HiFi also retain a small mode-specific movement floor so selecting the mode alone changes its character.
+- Age deepens head loss and saturation in Tape, bandwidth/compander texture in BBD, and restrained wear and asperity in HiFi. It is disabled only in Digital mode.
 - Fixed two-line contextual information area.
 - Top-right Power indicator is illuminated while processing is active and unlit while bypassed. Host bypass automation remains conventional, uses a smoothed dry/processed transition and leaves the delay engine running.
-- Related controls are grouped into Timing, Dry/Wet–Output, Lo Cut–Hi Cut and Drive–Age–Wow–Flutter panels.
+- FDBK, CROSS and SPREAD share a shallow upper panel aligned with Hi Cut.
+- DUCK, ATTACK and RELEASE share a matching lower panel aligned with Lo Cut.
+- Dry/Wet–Output is the rightmost panel because it is last in the audible signal chain.
+- The coloured frame has equal left and right insets around the control panels.
+- The complete upper control row, including both Time knobs, sits four pixels higher while the lower row retains its previous position. Link L/R and Tempo Sync are centred beneath their corresponding Time knobs.
+- The former purple panel background follows the selected mode: Digital blue, Tape green, BBD red, HiFi orange and Ghost purple.
+- The Mode selector now occupies the former `STEREO DELAY / sl23` header position.
 - Compact rotary styling shared with SV-Drummer.
+
+## 0.10.0 wet-return ducking and stacked panels
+
+- Added smoothed, host-automatable Duck, Attack and Release controls.
+- Added a stereo-linked input envelope that turns down the audible wet return without changing the dry path or the audio recirculating inside the feedback loop.
+- Restored FDBK, CROSS and SPREAD to a single horizontal row in a reduced-height upper panel.
+- Added a matching lower Ducking panel containing DUCK, ATTACK and RELEASE.
+- Aligned the upper panel with Hi Cut and the lower panel with Lo Cut.
+- Moved all upper-row knobs up four pixels, left the lower row in place and centred the two Timing switches beneath their respective knobs.
+- Widened the interface only as much as needed to preserve equal six-pixel coloured margins.
+
+## 0.9.0 knob timing and Ghost mode
+
+- Removed both Note combo boxes and made the existing Left and Right Time knobs switch directly between millisecond and musical-note parameters.
+- Preserved independent millisecond and note-division values for each channel, including while Link L/R is active.
+- Aligned both Time knobs with the upper control row and retained the Tempo Sync LED switch.
+- Reflowed FDBK and CROSS onto the upper row with SPREAD centred beneath them.
+- Reduced the grouped panel widths and the overall interface width while restoring equal coloured margins at both sides.
+- Added Ghost as a real fifth algorithm with continuous delay movement, stereo-opposed frequency shifting, analogue filtering and feedback saturation.
+- Added a purple Ghost interface colour and updated the contextual mode description.
+
+## 0.8.0 stereo spread and timing clarity
+
+- Added a smoothed, host-automatable bipolar Spread parameter.
+- Applied Spread to the audible wet mid/side image after the feedback path, so width changes do not alter Cross timing or regeneration.
+- Grouped FDBK, CROSS and SPREAD in a new three-control panel.
+- Moved Dry/Wet–Output to the far right and retained Hi Cut above Lo Cut.
+- Removed the `STEREO DELAY / sl23` subtitle and moved Mode into its header position.
+- Added mode-coloured panel backgrounds based on the blue, green, red and orange Valhalla mode families.
+- Made the active timing source explicit: millisecond knobs for Free time, Note selectors for Tempo Sync.
+- Added same-direction wheel-event suppression to prevent the remaining two-item jumps reported with some mice.
+
+## 0.7.1 audible mode identity and wheel fix
+
+- Corrected the weak mode separation that allowed Tape and HiFi to sound almost identical to Digital when the character controls were low.
+- Kept Digital clean and stable as the reference path.
+- Gave Tape inherent two-stage head loss, soft saturation and delay-dependent wow/flutter movement before Age adds further wear.
+- Made BBD substantially darker, with stronger delay-dependent bandwidth loss, coarser clock resolution, compander texture and controlled saturation.
+- Gave HiFi a brighter reel-to-reel response with gentle saturation, restrained filtering and much smaller drift than Tape.
+- Replaced JUCE's accumulated combo-box wheel stepping with a deterministic one-item handler, preventing ignored first movements and occasional two-item jumps.
+- Kept the existing 20 ms mode crossfade so switching modes remains click resistant.
+- Swapped the filter layout so Hi Cut is above Lo Cut.
 
 ## 0.5.0 timing and feedback changes
 
@@ -131,36 +188,49 @@ Models a dark bucket-brigade delay with continuous pitch-changing time movement,
 
 ## Pre-1.0 state policy
 
-Backward compatibility is intentionally not supported during early development. Version 0.7.0 uses a new state schema because the Note and Mode choices changed. Remove old Afterglow instances from test projects and insert a fresh 0.7.0 instance.
+Backward compatibility is intentionally not supported during early development. Version 0.10.0 uses state schema 11. Remove old Afterglow instances from test projects and insert a fresh 0.10.0 instance.
 
 Once version 1.0.0 is released, parameter IDs and saved-state compatibility become release requirements.
 
-## Suggested 0.7.0 test
+## Suggested 0.10.0 test
 
-1. Run `- Build.bat` and confirm the heading reports 0.7.0 and all four checks pass.
+1. Run `- Build.bat` and confirm the heading reports 0.10.0 and all four checks pass.
 2. Remove any older Afterglow instance from PHI and load a fresh one.
-3. Set distinct Left and Right Time values, enable Link L/R and turn Left Time. Right Time should visually follow it and become unavailable for separate editing.
-4. Disable Link L/R and confirm the original independent Right Time value returns.
-5. Repeat the same test with distinct Left and Right Note values in Tempo Sync mode; Right Note must return to its previous value when unlinked.
-6. Set Dry/Wet to 100%, Feedback to 0%, and trigger a short drum hit. One delayed echo should be heard.
-7. Raise Feedback through 25%, 50%, 75% and 95%. Each increase should retain more echoes and lengthen the decay.
-8. Carefully test 100-200% at a low monitoring level. The delay should enter controlled self-oscillation rather than producing invalid or unbounded samples.
-9. Compare Digital and Tape feedback. Tape should progressively colour and softly compress the accumulating repeats.
-10. Confirm Cross, Dry/Wet, Drive, Age, Wow and Flutter display percentages rather than decimal fractions.
-11. Confirm Dry/Wet snaps gently to 50%, Output snaps to 0 dB, and both indicator arcs begin at their centre positions.
-12. Move Dry/Wet away from centre, double-click it and confirm it returns to 50%.
-13. Toggle the top-right Power control while audio and delay tails are active. It should transition cleanly without a click, pass dry audio when off and preserve the running tail for re-entry.
-14. Confirm the centred power symbol glows when processing is on and becomes unlit when processing is bypassed.
-15. Confirm the narrower Timing panel has symmetrical side margins, a 12-pixel gap between the Note selectors, and correctly centred `L — TIME — R` / `L — NOTE — R` headings.
-16. Scroll the mouse wheel over Mode, Left Note and Right Note, and confirm every selector changes.
-17. Select `1/64`, `1/64 D` and `1/64 T` in Tempo Sync mode and confirm all three timings work.
-18. Switch among Digital, Tape, BBD and HiFi while a tail is active and confirm the transition is smooth and all four modes sound distinct.
-19. In BBD mode, increase Age and confirm the repeats become darker and grainier without unstable level jumps.
-20. Change BBD delay time while audio is repeating and confirm the pitch moves continuously; repeat in Digital mode and confirm its clean crossfade behaviour remains intact.
-21. Compare Tape and HiFi: both should move pitch continuously when delay time changes, while HiFi remains brighter and cleaner.
-22. Confirm the top-right indicator glows when processing is active and turns off when bypassed; audio must still crossfade without clicking.
-23. Confirm Dry/Wet–Output, Lo Cut–Hi Cut and Drive–Age–Wow–Flutter appear in their own panels while Feedback, Cross and Mode remain in their previous positions.
-24. Save and reopen the PHI project created with 0.7.0 and confirm its state restores.
+3. With Tempo Sync off, confirm both Time knobs display milliseconds and respond normally.
+4. Set distinct Left and Right millisecond values and remember them.
+5. Turn Tempo Sync on and confirm the same knobs immediately display musical note values rather than milliseconds.
+6. Turn both synced knobs through straight, dotted and triplet divisions, including `1/64`, `1/64 D` and `1/64 T`, and confirm every position changes the delay time.
+7. Turn Tempo Sync off and confirm the independent millisecond values from step 4 return unchanged.
+8. Turn Tempo Sync on again and confirm the note values from step 6 also return unchanged.
+9. In free timing, enable Link L/R and turn the left knob. The right knob should follow visually and become unavailable for separate editing.
+10. Disable Link L/R and confirm the original independent right millisecond value returns. Repeat this test with different right and left note values in Tempo Sync mode.
+11. Confirm `L — TIME — R` changes to `L — NOTE — R` with Tempo Sync and both timing knobs align vertically with Hi Cut.
+12. Set Dry/Wet to 100%, Feedback to 0%, and trigger a short drum hit. One delayed echo should be heard.
+13. Raise Feedback through 25%, 50%, 75% and 95%. Each increase should retain more echoes and lengthen the decay.
+14. Carefully test 100-200% at a low monitoring level. The delay should enter controlled self-oscillation rather than producing invalid or unbounded samples.
+15. Confirm Cross, Spread, Dry/Wet, Drive, Age, Wow and Flutter display percentages rather than decimal fractions.
+16. Confirm Spread snaps gently to 0%, Dry/Wet to 50% and Output to 0 dB; each bipolar indicator arc must begin at its centre position.
+17. Move Spread and Dry/Wet away from centre, double-click each and confirm they return to 0% and 50% respectively.
+18. With different Left and Right delay times, sweep Spread from +100% through 0% to -100%. The repeats should move from full width to centred to reversed placement without changing their timing or decay.
+19. Confirm FDBK, CROSS and SPREAD form one horizontal upper panel aligned with Hi Cut.
+20. Confirm DUCK, ATTACK and RELEASE form one horizontal lower panel aligned with Lo Cut.
+21. Confirm the upper knobs are four pixels higher than before, the lower row is unchanged, and Link L/R and Tempo Sync are centred beneath the Left and Right Time knobs respectively.
+22. Confirm the control panels have equal coloured spacing at the left and right edges and Dry/Wet–Output remains the rightmost panel.
+23. With Duck at 0%, confirm the delay level and character are unchanged as Attack and Release move.
+24. Set Duck to 100%, play repeated dry transients and confirm the audible echoes move out of the way while each transient is present.
+25. Repeat step 24 at a 50% Dry/Wet balance and confirm ducking changes the wet return only; the direct signal must not dip.
+26. Raise Feedback, sustain the ducking input, then stop. Confirm the internally regenerating tail returns according to Release instead of having been removed from the feedback loop.
+27. Compare short and long Attack values and confirm they change how quickly the wet return is attenuated without clicks.
+28. Compare short and long Release values and confirm they change how quickly the wet return recovers without pumping, invalid samples or runaway output.
+29. Scroll one notch at a time over the Mode selector. The first notch must respond and every physical notch must move exactly one item, never two.
+30. Set Drive, Age, Wow and Flutter to 0%, Lo Cut to minimum, Hi Cut to maximum and Dry/Wet to 100%. Compare Digital, Tape, BBD, HiFi and Ghost; each must be audibly distinct.
+31. In Ghost mode, use a sustained note and raise Feedback. The repeat spectrum should keep moving rather than merely changing tone once.
+32. Confirm Ghost shifts the two stereo channels in opposing directions and retains a clearly spatial result when Spread is positive.
+33. Increase Age in Ghost mode and confirm the repeats become darker and more saturated without unstable level jumps.
+34. Change Ghost delay time while audio repeats and confirm continuous analogue-style pitch movement; repeat in Digital mode and confirm its clean crossfade remains intact.
+35. Switch modes and confirm the frame changes blue for Digital, green for Tape, red for BBD, orange for HiFi and purple for Ghost.
+36. Toggle the top-right Power control while audio and delay tails are active. It should crossfade cleanly, pass dry audio while off and preserve the running tail.
+37. Save and reopen the PHI project created with 0.10.0 and confirm its state restores.
 
 ## Forward development plan
 
@@ -178,12 +248,13 @@ The reference products define the functional target; their proprietary code, bra
 - This remains an early prototype, not a 1.0 release.
 - Wow and Flutter currently have fixed internal rates.
 - The interface is fixed-size.
+- Ducking currently listens to the main stereo input with a fixed detector sensitivity; external sidechain input is not implemented yet.
 - Drive is a single soft-clipping type; the planned distortion-type collection is not implemented yet.
-- Ghost/frequency shifting, reverse, pitch, granular processing, diffusion, presets, A/B comparison, multitaps, LFO routing and third-party preset import remain future stages.
+- Adjustable frequency-shift controls, reverse, pitch, granular processing, diffusion, presets, A/B comparison, multitaps, LFO routing and third-party preset import remain future stages.
 - Final trademark clearance for the Afterglow name has not been completed.
 
 ## Versioning
 
-- Small fixes and adjustments increment the final number: `0.7.1`, `0.7.2`, `0.7.3`.
-- New feature stages increment the middle number: `0.8.0`, `0.9.0`, `0.10.0`.
+- Small fixes and adjustments increment the final number: `0.10.1`, `0.10.2`, `0.10.3`.
+- New feature stages increment the middle number: `0.11.0`, `0.12.0`, `0.13.0`.
 - `README.md` and `Changelog.md` are updated with every release.
