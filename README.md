@@ -222,39 +222,4 @@ Once version 1.0.0 is released, parameter IDs and saved-state compatibility beco
 26. Raise Feedback, sustain the ducking input, then stop. Confirm the internally regenerating tail returns according to Release instead of having been removed from the feedback loop.
 27. Compare short and long Attack values and confirm they change how quickly the wet return is attenuated without clicks.
 28. Compare short and long Release values and confirm they change how quickly the wet return recovers without pumping, invalid samples or runaway output.
-29. Scroll one notch at a time over the Mode selector. The first notch must respond and every physical notch must move exactly one item, never two.
-30. Set Drive, Age, Wow and Flutter to 0%, Lo Cut to minimum, Hi Cut to maximum and Dry/Wet to 100%. Compare Digital, Tape, BBD, HiFi and Ghost; each must be audibly distinct.
-31. In Ghost mode, use a sustained note and raise Feedback. The repeat spectrum should keep moving rather than merely changing tone once.
-32. Confirm Ghost shifts the two stereo channels in opposing directions and retains a clearly spatial result when Spread is positive.
-33. Increase Age in Ghost mode and confirm the repeats become darker and more saturated without unstable level jumps.
-34. Change Ghost delay time while audio repeats and confirm continuous analogue-style pitch movement; repeat in Digital mode and confirm its clean crossfade remains intact.
-35. Switch modes and confirm the frame changes blue for Digital, green for Tape, red for BBD, orange for HiFi and purple for Ghost.
-36. Toggle the top-right Power control while audio and delay tails are active. It should crossfade cleanly, pass dry audio while off and preserve the running tail.
-37. Save and reopen the PHI project created with 0.10.0 and confirm its state restores.
-
-## Forward development plan
-
-Development now follows this order, one stable feature stage at a time:
-
-1. Reproduce the practical controls, settings, routing choices and audible behaviours of ValhallaDelay as closely as possible, using Afterglow's own implementation and interface. This establishes the complete primary delay foundation first.
-2. After that foundation is working and tested, expand Afterglow with the additional controls, settings and workflow ideas available in Sixth Sample Deelay PE.
-3. Add a flexible LFO and modulation-target system.
-4. Evaluate and, if it remains useful, add a Seqwencer-style step sequencer with drag-and-drop parameter targets.
-
-The reference products define the functional target; their proprietary code, branding and graphical assets are not copied.
-
-## Current limitations
-
-- This remains an early prototype, not a 1.0 release.
-- Wow and Flutter currently have fixed internal rates.
-- The interface is fixed-size.
-- Ducking currently listens to the main stereo input with a fixed detector sensitivity; external sidechain input is not implemented yet.
-- Drive is a single soft-clipping type; the planned distortion-type collection is not implemented yet.
-- Adjustable frequency-shift controls, reverse, pitch, granular processing, diffusion, presets, A/B comparison, multitaps, LFO routing and third-party preset import remain future stages.
-- Final trademark clearance for the Afterglow name has not been completed.
-
-## Versioning
-
-- Small fixes and adjustments increment the final number: `0.10.1`, `0.10.2`, `0.10.3`.
-- New feature stages increment the middle number: `0.11.0`, `0.12.0`, `0.13.0`.
-- `README.md` and `Changelog.md` are updated with every release.
+29. Scroll one notch at a time over the Mode selector. The first notch must respond and every physical 
