@@ -1,4 +1,4 @@
-# Afterglow 0.10.0
+# Afterglow
 
 Afterglow is an early-development stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 0.10.0 adds a dedicated wet-return ducker and reorganises the centre controls into compact stacked Feedback and Ducking panels.
 
