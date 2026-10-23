@@ -14,9 +14,6 @@ Afterglow is a stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite
 Credits: Many thanks to Artvera for the logo.
 
 ![Afterglow](Resources/Afterglow.jpg)
-![Afterglow](Resources/Afterglow.jpg)
-![Afterglow](Resources/Afterglow.jpg)
-
 
 ## Build and installation
 
