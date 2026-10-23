@@ -1,4 +1,4 @@
-# Afterglow
+# Afterglow 1.40.0
 
 <div align="center">
 
@@ -9,11 +9,14 @@
 
 </div>
 
-Afterglow is a stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 1.39.0 recalibrates the shared modulation-depth and Feedback curves from matched Shuffler recordings. Digital, Brigade and HiFi presets now receive substantially deeper pitch motion, while mid-range Feedback produces a longer natural tail without altering the established 97-100% response.
+Afterglow is a stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 1.40.0 begins the Delay Style routing rebuild. Converted presets now retain their original Single, Dual, Ratio, Ping-Pong or Quad identity, while Ping-Pong uses a direct Left-to-Right transfer and applies Feedback once per complete stereo circuit.
 
 Credits: Many thanks to Artvera for the logo.
 
 ![Afterglow](Resources/Afterglow.jpg)
+![Afterglow](Resources/Afterglow.jpg)
+![Afterglow](Resources/Afterglow.jpg)
+
 
 ## Build and installation
 
@@ -112,9 +115,9 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - Switching either Tempo Sync LED never converts or overwrites that channel's stored millisecond and note values.
 - The Mode and Distortion Type choices use readable title case and are shown alphabetically while retaining their direct parameter identities. Both popups always open downwards with the first item at the top, use the selectors' text colour, a restrained dark hover rectangle inset from the two-pixel coloured border, and retain the current mode colour around that border. Wheel handling still advances exactly one item per physical movement from the first movement.
 - The two Tempo Sync LEDs illuminate green, Link L/R illuminates amber and Ping-Pong retains its teal status colour.
-- Feedback runs from 0% to 200%. The displayed 0-60% remains a direct traditional mapping. From 60-90%, one smooth global calibration approaches Valhalla's square-root-like decay response: Shuffler's displayed 73.8% maps to approximately 79.1% internal retention and 90% maps to approximately 94.9%. From 90-100%, the square-root response preserves the already matched 95.5%→97.7% and 97%→98.5% values before reaching exact unity. This calibration is identical in every mode and changes only repeat length. The displayed 100-200% range continues linearly to 100-125% internal regeneration. Pitch Rev alone restores a small, fixed transposition-dependent loop loss above unity so extreme downward or upward shifts can leave the audible band instead of forming a permanent saturator tone; no envelope follower or pumping gain is used. Per-mode saturation and static output-only safety keep extreme output bounded without compressor pumping. Cross Feedback remains continuously variable; at 100% Cross, each repeat feeds the opposite channel while retaining normal stereo input routing.
+- Feedback runs from 0% to 200%. The displayed 0-80% uses a direct traditional mapping. From 80-97%, a smooth transition reaches the established square-root response used by the matched high-feedback reference; 97-100% retains that response through exact unity. The temporary 60-90% boost has been removed because it was compensating for the former double attenuation in Ping-Pong. The displayed 100-200% range continues linearly to 100-125% internal regeneration. Pitch Rev alone restores a small, fixed transposition-dependent loop loss above unity so extreme shifts can leave the audible band instead of forming a permanent saturator tone; no envelope follower or pumping gain is used. Per-mode saturation and static output-only safety keep extreme output bounded without compressor pumping. Cross Feedback remains continuously variable; at 100% Cross, each repeat feeds the opposite channel while retaining normal stereo input routing.
 - The compact snowflake button smoothly excludes new input from the delay and moves the existing feedback loop to unity while leaving the dry signal, selected mode, timing, modulation and stored FDBK value untouched. Its neighbouring LED selects `MOMENTARY`—the default, active only while held—or `TOGGLE`, which latches and releases Freeze on successive clicks.
-- Ping-Pong is a separate smoothed routing mode: it sums the delayed input safely into the Left tap, silences the initial Right feed and forces alternating cross-feedback. Turning it off restores the Cross knob's normal routing without a hard switch.
+- Ping-Pong is a dedicated smoothed topology: it sums the input safely into the Left delay, transfers the processed Left output directly into the Right delay, then applies FDBK only when the Right output returns to Left. A complete stereo circuit therefore receives one Feedback multiplication rather than the former `feedback × feedback` loss. Turning Ping-Pong off restores the Cross knob's normal stereo matrix without a hard switch.
 - Bipolar Spread from -100% to +100% controls delayed-signal width without changing the Cross-feedback rhythm: 0% centres the repeats, +100% gives full width and negative values reverse their left/right placement. It has a centre detent.
 - Duck from 0% to 100% reduces only the audible wet return while new input is present. The dry signal and internal feedback regeneration remain untouched, so repeats recover naturally instead of being erased from the delay loop.
 - Duck Attack ranges from 1 to 500 ms and Duck Release from 20 to 3000 ms. A stereo-linked peak envelope prevents the delayed image from shifting sideways while it ducks.
@@ -122,7 +125,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - Mod Amount from 0% to 100% adds up to 35 ms of smooth delay-time movement, calibrated from the Shuffler harmonic excursion. Digital uses a rounded triangle: linked channels move together and independent channels are offset by 90 degrees. LoFi substitutes stereo-decorrelated random drift, Crystal uses its own smoothed triangle path, and Phaser uses the same 0-100% control range for its stereo notch sweep. Mod Rate ranges from 0.02 to 10 Hz. At extremely short Digital times the complete depth is retained by moving only the otherwise-negative portion of the sweep forward from a 0.25 ms safety floor.
 - In Pitch, Pitch Rev and Pitch Lush modes, bipolar Shift selects -24.00 to +24.00 semitones. Bipolar Detune selects a -1.000 to +1.000-semitone total stereo difference in 0.001-semitone (0.1-cent) steps: Left receives half below the Shift value and Right half above it; a negative Detune reverses that relationship. One semitone equals 100 cents, so this Detune range is exactly -100 to +100 cents.
 - Shift and Detune have centre detents in the pitch modes. In Ghost the panel attaches to separate Hertz parameters: bipolar Shift covers -1000 to +1000 Hz and unipolar Detune covers 0-100 Hz. In Phaser the same panel becomes active RES and stepped STAGE controls; elsewhere it is visibly unavailable.
-- 0-60% Feedback maps directly to loop regeneration. A global calibration lengthens 60-100% equally in every mode and reaches the established square-root response at 90%; mode-specific filtering and saturation colour the repeats without selecting a different Feedback-length curve. Pitch Rev's fixed transposition loss begins only above 100%.
+- 0-80% Feedback maps directly to loop regeneration. A smooth high-feedback calibration reaches the established square-root response at 97%; mode-specific filtering and saturation colour the repeats without selecting a different Feedback-length curve. Pitch Rev's fixed transposition loss begins only above 100%.
 - Per-mode saturation and static output-only compensation keep dense tails controlled without envelope detection, compressor pumping or time-varying gain inside the feedback loop.
 - Dry/Wet balance and Output gain.
 - Dry/Wet has a 50% centre detent; Output has a 0 dB centre detent. Their indicator arcs grow outwards from their centre positions.
@@ -146,7 +149,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - The Link L/R and Ping-Pong captions use the same muted colour as the Theme caption for a quieter, consistent switch row.
 - The small Theme knob beside Power has no numerical readout. Turning it clockwise fades only the large surround from charcoal into the selected mode colour. The seven-pixel strip is always painted above it at the selected mode's exact colour and full opacity—its colour and alpha never change. At maximum Theme the surround reaches that same colour, so the unchanged strip naturally blends into it.
 - The strip has a two-pixel clear gap above the control panels. The surround extends ten pixels beyond the panels at both sides, matching the panels' ten-pixel top inset.
-- Artvera's transparent 701×167 Afterglow logo remains at the upper left. The compact `v1.39.0` label sits directly above the Power button, freeing the middle of the header for preset navigation.
+- Artvera's transparent 701×167 Afterglow logo remains at the upper left. The compact `v1.40.0` label sits directly above the Power button, freeing the middle of the header for preset navigation.
 - Mode, Dist Type and the compact Freeze controls sit further left. A rounded current-preset field with enlarged text is followed by adjacent, equal-sized previous/next buttons before the unchanged list-icon preset-browser button; Theme and Power retain their positions. The arrows use the same stroked yellow chevron as the selectors, rotated left and right. Wheel movement over the field loads one preset, while clicking it opens a two-pixel mode-coloured popup using the same font size as the selectors and at most 20 visible, scrollable rows.
 - Theme and Power use matching 30×30 controls on the same lower header baseline. The Theme label is two pixels lower for better visual alignment without moving either control.
 - Compact rotary styling shared with SV-Drummer.
@@ -475,14 +478,14 @@ The Korg Electribe EA-1 reference behaves differently from a conventional indepe
 
 ## Saved-state compatibility policy
 
-Version 1.32.0 established schema 32 as Afterglow's first public saved-state and preset compatibility baseline. Version 1.33.0 introduced schema 33 because Ghost gained two saved parameters, and performs one explicit schema-32-to-33 migration that inserts only those controls while preserving the former fixed frequency-shift sound. Versions 1.33.1 through 1.39.0 retain schema 33 and every parameter ID.
+Version 1.32.0 established schema 32 as Afterglow's first public saved-state and preset compatibility baseline. Version 1.33.0 introduced schema 33 because Ghost gained two saved parameters. Version 1.40.0 introduces schema 34 and one internal Delay Style choice. Schema 32/33 states receive only the missing public parameters; existing Link, Ping-Pong and Multi-Tap values infer Single, Dual, Ping-Pong or Quad. Ratio requires reconversion because earlier files discarded that identity.
 
-No pre-public converter, legacy parameter alias or general backward-compatibility layer has been restored. Schema 32 remains the sole older public format accepted by 1.39.0.
+No pre-public converter, legacy parameter alias or general compatibility framework has been restored. Only the two published schemas are accepted by 1.40.0.
 
-## Suggested 1.39.0 test
+## Suggested 1.40.0 test
 
-1. Run `- Build.bat` and confirm the heading reports 1.39.0 and all four checks pass, including the logo requirement.
-2. Load a fresh Afterglow 1.39.0 instance in PHI.
+1. Run `- Build.bat` and confirm the heading reports 1.40.0 and all four checks pass, including the logo requirement.
+2. Load a fresh Afterglow 1.40.0 instance in PHI.
 3. With both Tempo Sync LEDs off, confirm both Time knobs display milliseconds and respond normally.
 4. Set distinct Left and Right millisecond values and remember them.
 5. Turn only Left Tempo Sync on and confirm Left shows note values while Right remains in milliseconds; then test the inverse state.
@@ -493,7 +496,8 @@ No pre-public converter, legacy parameter alias or general backward-compatibilit
 10. While linked, change Left Tempo Sync and confirm the disabled Right LED follows the effective Left state while remaining visibly dim. Unlink and confirm Right's prior time, division and sync state all return.
 11. Confirm the two Tempo Sync LEDs illuminate green, Link L/R illuminates amber and Ping-Pong retains its teal colour. Confirm Link L/R and Ping-Pong captions match the muted Theme caption colour. Confirm the Tempo Sync LEDs and centred label sit directly beneath their respective Time knobs, above the Link/Ping-Pong row, and that the timing heading shows TIME, NOTE or the mixed Left/Right state accurately.
 12. Set Dry/Wet to 100%, Feedback to 0%, and trigger a short drum hit. One delayed echo should be heard.
-13. Raise Feedback through 25%, 50%, 60%, 73.8%, 90% and 95.5%. Values through 60% remain direct; 73.8% should have a clearly longer but still finite tail at approximately 79.1% internal retention. Then repeat the matched `1/16 T`, 97% reference test: the target remains approximately twelve seconds rather than the previous six, never several minutes, with the same length mapping in every mode apart from its intended tonal decay.
+13. In ordinary Stereo routing, raise Feedback through 25%, 50%, 73.8%, 80%, 90% and 95.5%. Values through 80% remain direct. Then repeat the matched `1/16 T`, 97% reference test: the target remains approximately twelve seconds rather than the previous six, never several minutes, with the same length mapping in every mode apart from its intended tonal decay.
+   - Load the regenerated Shuffler preset. Confirm its first echo begins on Left, the processed Left echo transfers to Right without the former FDBK attenuation, and only the completed Right-to-Left circuit receives the displayed 73.8% gain. Compare the supplied recording for alternating level and decay before judging modulation depth.
 14. Carefully test 100-200% at a low monitoring level. The control should move decisively from sustained repeats into coloured self-oscillation. The audible output must remain finite and statically bounded without compressor-style pumping.
 15. Confirm Cross, Spread, Duck, Diffusion Amount, Diffusion Size, Mod Amount, Dry/Wet, DIST, Age, Wow and Flutter display percentages rather than decimal fractions.
 16. Confirm Spread snaps gently to 0%, Dry/Wet to 50% and Output to 0 dB; each bipolar indicator arc must begin at its centre position.
@@ -558,7 +562,7 @@ No pre-public converter, legacy parameter alias or general backward-compatibilit
 75. Select CRACKLE and raise DIST on a steady or percussive source. Confirm irregular signal-responsive pops and compact saturation appear without DC drift, runaway gain or crackles when changing Distortion Type.
 76. Compare Chromatic with Tape I at identical settings. Confirm Chromatic is brighter, cleaner, less wobbly and more controlled in feedback. Sweep AGE from 0% to 100% and confirm Chromatic now changes unmistakably from open and clean to dark and compressed.
 77. Select LIGHTNING and raise DIST on a sustained source. Confirm sharp clipped harmonics and signal-tracked white noise increase without DC drift, invalid samples or an uncontrolled level jump.
-78. Confirm `v1.39.0` appears directly above the Power button without touching the Theme label or control.
+78. Confirm `v1.40.0` appears directly above the Power button without touching the Theme label or control.
 79. Compare Analogue and Brigade at identical settings. Confirm Analogue is substantially brighter and quieter, retains restrained clock motion and develops a thicker asymmetric saturation character as AGE rises.
 80. Select AMP and raise DIST on clean guitar, keys or a sustained test tone. Confirm it moves from warm edge into gritty overdrive with controlled high frequencies, no DC drift, no invalid samples and no feedback-loop re-distortion.
 81. Toggle the Timing panel's bottom-row `MULTI` LED and confirm the stereo controls are replaced by four compact, evenly spaced rows headed Time, Pan, Vol and On without changing the panel size. Confirm the numbers 1–4 are centred inside their On LEDs with no separate number column, then toggle back and confirm the complete stereo setup returns unchanged.
@@ -624,5 +628,5 @@ The reference products define the functional target; their proprietary code, bra
 ## Versioning
 
 - Small fixes and adjustments increment the final number: `1.35.1`, `1.35.2`.
-- New feature stages increment the middle number: `1.38.0`, `1.39.0`.
+- New feature stages increment the middle number: `1.39.0`, `1.40.0`.
 - `README.md` and `Changelog.md` are updated with every release.
