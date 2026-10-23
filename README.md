@@ -1,4 +1,4 @@
-# Afterglow 1.39.0
+# Afterglow
 
 <div align="center">
 
@@ -10,6 +10,8 @@
 </div>
 
 Afterglow is a stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite. Version 1.39.0 recalibrates the shared modulation-depth and Feedback curves from matched Shuffler recordings. Digital, Brigade and HiFi presets now receive substantially deeper pitch motion, while mid-range Feedback produces a longer natural tail without altering the established 97-100% response.
+
+![Afterglow](Resources/Afterglow.jpg)
 
 ## Build and installation
 
