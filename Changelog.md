@@ -1,5 +1,232 @@
 # Afterglow — Changelog
 
+## 1.51.0 — Continuous Time-Dependent Processing — 24 October 2026
+
+### Fixed
+
+- Analysed the supplied Time-adjustment recording and confirmed that the audible ticks were short broadband discontinuities during knob movement rather than the intended continuous Doppler pitch sweep.
+- Traced the shared fault to secondary delay calculations following the raw block-rate Time parameter while the principal delay read head followed an 80 ms smoothed value. Modulation depth and Diffusion span could therefore jump by several samples at each mouse update even though the main read position remained continuous.
+- Made modulation-range scaling, Digital and Crystal modulation safety, LoFi slow/scrape depth and every stereo Diffusion bank derive from the same per-sample effective Time position as the audible delay head.
+- Made Multi-Tap Diffusion follow the continuously smoothed shortest active tap and interpolate with the existing Stereo/Multi-Tap transition. Changing a tap time or switching timing layouts no longer bypasses the correction.
+
+### Verification
+
+- Reproduced a 50-1000 ms knob sweep with parameter updates at approximately 62.5 Hz. At 100% Mod Amount, update-boundary peak discontinuity fell from approximately 0.125 to 0.025.
+- With Diffusion active, the same boundary peak fell from approximately 0.93 to 0.02. Update boundaries are now comparable with neighbouring signal samples rather than producing isolated broadband spikes.
+- Repeated the sweep in Brigade, Digital and Tape modes with clean, modulation-only, diffusion-only and combined settings. Clean Digital timing was already continuous and remains unchanged.
+
+### Changed
+
+- Retained each mode's intended Time character: analogue-style modes still create smooth pitch/varispeed movement, while Digital retains its click-resistant tap crossfade. The correction removes discontinuities without forcing every algorithm to use the same sonic transition.
+- Left the v1.49.0 Feedback calibration and v1.50.0 BBD/Analogue compander topology unchanged.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive continuous Time-dependent processing directly without migration code.
+
+## 1.50.0 — Stable Analogue Compander Feedback — 24 October 2026
+
+### Fixed
+
+- Compared matched 252 ms BBD Modder recordings. The reference decayed continuously to approximately -70 dBFS, while Afterglow initially fell, reversed direction after roughly five seconds and stabilised near -20 dBFS around a 340-350 Hz resonance.
+- Traced the self-excitation to the BBD instantaneous compander topology rather than its noise generator, modulation oscillator, preset data or global Feedback curve. Placing stateful filters between square-root compression and square expansion allowed particular filtered waveforms to manufacture loop gain below 100% Feedback.
+- Made BBD compression, quantisation, signal-tracked noise and expansion one memoryless colour stage, followed by the two low-pass stages and high-pass stage. The filters now provide predictable loss instead of being enclosed by a nonlinear expander.
+- Applied the same stable ordering to Analogue mode and to both modes' Multi-Tap paths, which shared the same latent compander fault.
+
+### Verification
+
+- Offline processor tests at 1, 1.5, 2, 5, 50, 252 and 1000 ms now decay without late re-triggering at BBD Modder's 95.6% Feedback and 100% Mod Amount.
+- Verified Stereo BBD, Multi-Tap BBD, Stereo Analogue and Multi-Tap Analogue at 252 ms. All four continued falling through the complete thirty-second test instead of converging on a resonant limit cycle.
+- Removed BBD noise entirely in an isolated diagnostic build and reproduced the original runaway unchanged, confirming that suppressing noise would not have corrected the fault. The established signal-tracked noise character therefore remains present.
+- Preserved deliberate regeneration above unity: the existing 100-200% global Feedback mapping and its output safety remain unchanged, and a 120% BBD test still sustains a bounded coloured loop.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing BBD and Analogue presets receive the stable compander topology directly without migration code.
+
+## 1.49.0 — Consistent Sub-Unity Feedback Tails — 24 October 2026
+
+### Fixed
+
+- Lengthened the shared Feedback tail below 100% after testing across the converted preset banks showed consistently shorter decays than the source effects, independent of delay mode or individual preset.
+- Applied a mathematically uniform decay-duration calibration across the complete 0-100% range. Theoretical tail duration is now approximately 11% longer, adding roughly one, two or three seconds to tails that previously lasted about nine, eighteen or twenty-seven seconds.
+- Preserved zero as silence, exact 100% as unity and the complete 100-200% regenerative mapping unchanged. The correction cannot leak into the deliberately controlled above-unity behaviour.
+
+### Changed
+
+- Kept the established conservative upper Feedback curve that replaced the former multi-minute 95% response, then applied the small duration correction to its result. This retains its shape instead of reintroducing a steep approach to unity.
+- Kept the correction shared by every mode, timing style and preset. No mode multiplier, preset-name test, extra limiter or output-envelope processing was added.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive the longer sub-100% decay directly without migration code.
+
+## 1.48.0 — Stable Pitch Regeneration — 24 October 2026
+
+### Fixed
+
+- Compared matched LowLowLow recordings. The reference peaked near -9.4 dBFS and faded to approximately -78 dBFS, while Afterglow climbed to exactly 0 dBFS and remained there as an almost entirely sub-50 Hz signal.
+- Extended the established transposition-aware regenerative loss from Pitch Rev to ordinary Pitch. Large downward shifts above 100% Feedback can no longer be held at unity by the generic saturation stage after their energy should have moved below the audible band.
+- At LowLowLow's -24-semitone shift and 128.8% displayed Feedback, the correction places the effective recirculation below unity instead of allowing a permanent sub-bass/DC limit cycle. Feedback at or below 100%, zero-shift Pitch sounds, every non-pitch mode and Freeze remain unchanged.
+- Corrected the one-time converter so Pitch retains its source Mod Rate and Mod Depth. LowLowLow's 100% modulation is no longer discarded, restoring the moving low-frequency texture instead of feeding a static pitch loop.
+
+### Changed
+
+- Kept both corrections parameter-driven. No preset-name test, fixed LowLowLow output trim, envelope follower or pumping gain control was added.
+- Left the v1.47.0 Multi-Tap repeat-head routing and the v1.44.0 signal-tracked analogue-noise behaviour unchanged.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing Pitch states receive the safer regenerative behaviour directly. Converted Pitch presets should be regenerated to recover their source modulation values.
+
+## 1.47.0 — Full-Strength Multi-Tap Regeneration — 24 October 2026
+
+### Fixed
+
+- Corrected the v1.46.0 dedicated repeat-head routing after testing showed no useful restoration of Fold Feeder's metallic Feedback effect.
+- Removed audible tap panning from the internal repeat return. The selected head remains panned normally at the plugin output, but now enters both feedback channels at full strength instead of being reduced to approximately 35% and 94% by Tap 4's pan position.
+- Preserved the selected head's processed waveform, modulation and level in the loop, while continuing to exclude the coincident four-tap sum that caused the original runaway.
+
+### Changed
+
+- Explicitly separated audible spatial placement from regeneration strength. Moving a Multi-Tap head across the stereo field no longer changes the effective Feedback percentage.
+- Left Multi-Tap output level, global Feedback calibration, mode processing and all non-Multi-Tap paths unchanged.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive the corrected repeat-head gain directly without migration code.
+
+## 1.46.0 — Dedicated Multi-Tap Repeat Head — 24 October 2026
+
+### Fixed
+
+- Replaced v1.45.0's coherence trim with the correct Multi-Tap feedback topology. Turning up Feedback no longer loses Fold Feeder's metallic, ring-modulated movement merely to keep the four-head sum stable.
+- Multi-Tap now takes its recirculating signal from the longest active repeat head. All enabled heads remain present at the audible output, but coincident heads cannot multiply the feedback loop because their sum is no longer used as the return source.
+- Preserved each repeat head's full processed signal, modulation, level and equal-power pan position in the loop. Feedback therefore remains an audible creative control rather than a safety-scaled copy of the complete Multi-Tap output.
+- Smoothed transitions between the summed audible path and dedicated repeat path with the existing Multi-Tap crossfade, avoiding a hard feedback-source switch.
+
+### Changed
+
+- Retained RMS normalisation exclusively for the audible Multi-Tap mix. Feedback routing is now structurally stable instead of being made safe by attenuating the entire summed result.
+- Left the global Feedback curve, per-mode saturation, signal-tracked analogue noise and output safety unchanged.
+- Kept the implementation shared by every Multi-Tap preset; Fold Feeder receives no preset-name exception.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing Multi-Tap presets and host states use the corrected repeat-head routing directly without migration code.
+
+## 1.45.0 — Coherence-Safe Multi-Tap Feedback — 24 October 2026
+
+### Fixed
+
+- Compared matched Fold Feeder recordings. The reference peaked at approximately -6.25 dBFS and decayed below -80 dBFS, while Afterglow grew to digital full scale and sustained 50 ms sections near -1.7 dBFS.
+- Traced the growth to four enabled Multi-Taps collapsing onto the same delay time. The existing RMS tap normalisation was correct for unrelated echoes but allowed coincident tap voltages to add coherently inside the feedback loop, turning the preset's displayed 100.2% Feedback into a substantially regenerative path.
+- Added coherence-aware feedback normalisation derived from the active tap levels and equal-power pan gains. Coincident taps can no longer multiply the internal loop gain merely because several reads contain the same waveform.
+- Applied the correction to normal stereo, Cross, Ratio and Ping-Pong feedback sources so no routing matrix can bypass it.
+
+### Changed
+
+- Kept the audible Multi-Tap output on its established RMS normalisation. The correction acts only on the recirculating return, so ordinary separated tap patterns do not become needlessly quieter at the plugin output.
+- Kept the correction fully parameter-driven and shared by every Multi-Tap preset. Fold Feeder receives no preset-name test, hidden feedback value or dedicated limiter.
+- Left the v1.44.0 signal-tracked analogue-noise correction, global Feedback curve, per-mode saturation and output safety unchanged.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing Multi-Tap presets and host states receive the corrected feedback normalisation directly without migration code.
+
+## 1.44.0 — Signal-Tracked Analogue Noise — 24 October 2026
+
+### Fixed
+
+- Compared matched BBD Modder recordings and traced Afterglow's no-input pitched bursts to its permanent BBD noise floor. At the preset's 1 ms delay, 95.6% Feedback and maximum modulation, that continuously injected noise was repeatedly captured by the short resonant loop even though no note had been played.
+- Reworked Brigade, Analogue, HiFi and LoFi noise so it follows actual signal activity below unity feedback. Once the delayed signal has decayed, these modes no longer retain an independent excitation source capable of restarting a short comb loop.
+- Applied the same signal tracking to Multi-Tap's Brigade, Analogue, HiFi and LoFi noise paths, avoiding a second route to the same idle-loop fault.
+- Preserved intentional self-oscillation behaviour: a bounded free-running noise component fades back in only above 100% loop gain and reaches its limited maximum at 125%.
+
+### Changed
+
+- Kept the correction entirely in the shared mode engine. BBD Modder, Feedback Harmor, Fold Feeder and LowLowLow receive no preset-name tests, hidden gain values or individual safety exceptions.
+- Left delay timing, modulation depth, Feedback calibration, filtering, saturation and output safety unchanged in this stage so the source of any remaining tonal mismatch can be assessed separately.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive the corrected noise behaviour directly without migration code.
+
+## 1.43.0 — Unitary Ratio Feedback — 24 October 2026
+
+### Fixed
+
+- Completed the retained Ratio delay style with a true energy-preserving two-channel feedback matrix. Unlike ordinary Dual timing, the left and right returns now continually recombine, so unequal times build progressively denser, pseudo-reverberant echo patterns instead of remaining two unrelated repeat streams.
+- Smoothed transitions between ordinary stereo, Ratio and Ping-Pong feedback topologies over the established 20 ms interval, avoiding a hard matrix switch while a tail is active.
+- Made Freeze capture a complete left-plus-right Ratio circulation. Coupled Ratio tails no longer freeze as two unrelated channel periods.
+
+### Changed
+
+- Kept Ratio as a general Afterglow routing behaviour rather than a preset-name correction. Converted Ratio presets and host-created Ratio states use the same matrix, with no special cases.
+- Replaced the converter note describing Ratio as unfinished; its already-materialised L/R timing now feeds the completed matrix.
+- Adopted the supplied README revision with the new Digital and Analogue screenshots ahead of the existing main interface screenshot. No release history was added to the instructional README.
+- Deliberately did not add an Era control. Afterglow continues to expose its useful tone-building components directly instead of adding a source-plugin compatibility control primarily for converted presets.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing converted Ratio presets gain the completed matrix immediately; no migration or compatibility branch was added.
+
+## 1.42.0 — Delay-Relative Diffusion and Reliable Freeze — 23 October 2026
+
+### Fixed
+
+- Replaced Freeze's dependence on nominal unity feedback with a dedicated, preallocated wet-cycle capture. Filters, diffusion, pitch processing and mode saturation can no longer make a frozen loop collapse merely because their true loop gain is below one.
+- Freeze captures independent stereo periods, a complete two-leg Ping-Pong circuit or the longest active Multi-Tap pattern, then crossfades to decay-free playback over the existing 20 ms smoothing interval. New input remains excluded, the dry path remains live and release returns smoothly to the still-running delay engine.
+
+### Changed
+
+- Rebuilt Diffusion Amount as the coefficient control inside the four-stage allpass cascade instead of a dry/diffused output blend. Values below 1% bypass the network; 68% now occupies the balanced attack/decay region and high values build a genuine diffusion tail.
+- Made Diffusion Size relative to the displayed delay. Its span now runs from 2% to 100%, and standard modes shorten the straight delay by the same amount so changing Size does not move the overall echo. Pitch Rev retains the intentional additive-diffusion exception.
+- Replaced the former fixed 60 ms diffusion store with four stage-proportional, preallocated buffers capable of the complete delay range. Left and right use different normalised stage spacings, while paired slow modulation scales with Size and cancels its net timing movement.
+- Multi-Tap derives one shared span from the shortest enabled tap and subtracts that same span from every active tap, preserving the complete tap pattern rather than changing its spacing.
+- Extended host tail reporting with the diffusion coefficient and span, so high-Amount reverb-like decays are not truncated merely because Feedback itself is low or zero.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive the corrected Freeze and Diffusion behaviour directly; no legacy branch, preset-name exception or migration layer was added.
+
+## 1.41.0 — Delay-Aware Modulation and Style Phase — 23 October 2026
+
+### Fixed
+
+- Replaced the shared fixed-width modulation sweep with delay-aware physical depth. The available range begins at 2.5 ms for near-zero delays, grows with delay time and reaches the established 35 ms maximum at 250 ms, so long-delay motion keeps the 1.39.0 calibration while flanger-length settings remain concentrated in the comb-filter range.
+- At Warble Flanger's 1 ms Digital time and 84.7% Mod Amount, the requested excursion is now approximately 1.89 ms rather than 25.1 ms. Its causal forward bias produces an approximately 0.25-4.03 ms moving delay instead of spending most of the cycle in chorus and doubling territory.
+- Applied the saved Delay Style to stereo modulation phase: Single uses matched motion, Dual uses 90-degree quadrature, and Ratio and Ping-Pong use 180-degree antiphase motion. Phaser and the shared periodic delay modulation now follow the same Style identity.
+- Gave Quad's four tap pairs staggered modulation phases while retaining antiphase left/right motion. Digital and Crystal taps keep independent rounded-triangle state so one head no longer forces every tap through the same movement.
+- Retained the 0.25 ms Digital/Crystal read floor by moving only the otherwise-negative portion of a short sweep forwards. Other centred modulation paths reduce only enough to remain above that floor.
+
+### Changed
+
+- Replaced the project README with the supplied badge-and-screenshot edition, kept the screenshot exactly once and removed the release number from its title and introduction. Release history, compatibility and versioning remain in this changelog rather than the instructional README.
+- Kept the modulation correction entirely in the shared engine. No preset-name checks or Warble Flanger, Shuffler or Elektrik exceptions were added, and Diffusion, Era conversion and Feedback calibration are unchanged in this stage.
+
+### Compatibility
+
+- Retained saved-state schema 34 and every parameter ID. Existing presets and host states receive the corrected modulation depth and Style phase directly without migration or backward-compatibility code.
+
+## 1.40.0 — Delay Style Foundation and Correct Ping-Pong Routing — 23 October 2026
+
+### Fixed
+
+- Replaced the former Ping-Pong cross-feedback approximation with its dedicated two-leg topology. New input begins on Left, the processed Left output transfers directly to Right, and FDBK is applied only when Right returns to Left. A complete stereo circuit now receives one Feedback multiplication rather than `feedback × feedback` loss.
+- Removed the temporary 60-90% global Feedback boost that had compensated for that double attenuation. The established direct response now extends through 80%, while the previously matched near-unity 97-100% decay remains unchanged.
+- Kept topology changes click-resistant by interpolating the complete normal-stereo and Ping-Pong loop inputs with the existing smoothed Ping-Pong control.
+
+### Changed
+
+- Added an internal Single/Dual/Ratio/Ping-Pong/Quad Delay Style parameter. The one-time Valhalla converter now preserves the original Style rather than discarding Ratio after materialising its audible timing.
+- Timing-page actions keep the internal Style identity synchronised: Link selects Single, ordinary unlinked timing selects Dual, Ping-Pong selects its dedicated style and Multi-Tap selects Quad. Imported Ratio remains identifiable until the user deliberately changes the timing style.
+- Regenerated the Richard Devine conversion bank as schema 34 so all thirty presets carry their exact source Style. Ratio timing remains materialised until its dedicated routing matrix is implemented in a later stage.
+
+### Compatibility
+
+- Advanced saved-state schema to 34. Published schema-32/33 states receive the missing controls only; earlier Single, Dual, Ping-Pong and Quad states are inferred from Link/Ping-Pong/Multi-Tap. Previously converted Ratio presets should be replaced by the regenerated bank because schema 33 did not retain that identity.
+
 ## 1.39.0 — Shared Modulation and Feedback Calibration — 23 October 2026
 
 ### Fixed
