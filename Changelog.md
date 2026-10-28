@@ -1,5 +1,251 @@
 # Afterglow — Changelog
 
+## 1.57.3 — Deelay Timing, Tape and Colour Readability — 28 October 2026
+
+### Changed
+
+- Renamed the `DRY / WET` control to `MIX`, including its host-visible parameter name, without changing its stable parameter ID or behaviour.
+- Restricted Sequencer LUM to the step display. Assigned-target labels and the HUE, SAT and LUM knob accents now retain a readable mid luminance while continuing to follow HUE and SAT.
+
+### Fixed
+
+- Converted Deelay PE's `preset_timeMs` as its actual skewed 0–1 knob position rather than mistaking it for seconds. Verified source values now reproduce the displayed 4 ms, 19 ms, 20 ms and 40 ms timings.
+- Converted Deelay PE's combined Tape motion into both Afterglow Wow and Flutter at two-thirds strength; a 69% source setting now produces approximately 46% on each control rather than being omitted.
+
+## 1.57.2 — Verified Deelay Choice Mapping — 28 October 2026
+
+### Fixed
+
+- Rebuilt Deelay/Deelay PE Mode conversion from the plugin's visible list order and one-based stored item IDs. Normal now remains the clean Digital family, while Rev Forw maps to Forward Rev instead of shifting every source choice by one.
+- Replaced positional DIST conversion with an explicit source-to-Afterglow table. This accounts for Deelay's distinct order, including Asym, Tube, Rectify, Samurai and Stressed.
+- Stopped changing a Normal Deelay preset into Tape I merely because its independent Tape amount was non-zero. The unsupported overlay is now reported rather than silently changing Mode.
+- Lowered only the draggable Left and Right timing captions by two pixels so `:: L` and `R ::` align with the central TIME/NOTE heading.
+
+## 1.57.1 — Label and Converter Corrections — 28 October 2026
+
+### Fixed
+
+- Preserved both colons in every draggable `:: LABEL` marker at small GUI scales while retaining exactly one space between the marker and caption. The caption itself remains centred over its knob, including the Left and Right timing headings.
+- Moved the complete HUE/SAT/LUM group left so all three compact knobs and labels remain inside the sequencer panel.
+- Clamped LUM to 20–100%, preventing the sequencer accent and assigned-target labels from becoming unreadably dark.
+- Corrected Deelay/Deelay PE distortion conversion to the same zero-based indexing used by its mode field.
+
+## 1.57.0 — Sequencer Colour and Self-Modulation — 28 October 2026
+
+### Added
+
+- Added a compact LUM control beside HUE and SAT. It adjusts the luminance of the sequence, target-label and colour-control accent and persists in `Settings.ini`.
+- Added Sequencer Attack, Release, Peak and Move as draggable modulation targets. These self-modulating controls use the previous evaluated sequence value, avoiding a circular calculation in the current step.
+
+### Fixed
+
+- Corrected Sixth Sample Deelay/Deelay PE mode conversion to its zero-based order: Normal, Reverse Forward, Pure Reverse, Chaos, Reverse Chaos, Frequency and Pitch.
+- Kept draggable parameter captions visually centred over their knobs. Their `::` marker now sits one measured space beside the centred caption without shifting it.
+- Removed the transient yellow hover colour from draggable labels, preventing labels crossed during a drag from remaining highlighted.
+- Matched Host Sync, Sequencer On and Bipolar typography to the other sequencer labels.
+
+## 1.56.0 — Sequence Tools and Deelay PE Conversion — 28 October 2026
+
+### Added
+
+- Added Sixth Sample Deelay PE `.sspreset` support to the external preset converter, including ZIP archives and ordinary unzipped folder trees. Directly corresponding timing, routing, feedback, stereo, ducking, diffusion, modulation, filtering, distortion and dry/wet settings are translated into Afterglow parameters.
+- Added Copy and Paste commands to the step-grid menu so a sequence can be transferred between presets.
+
+### Fixed
+
+- Integrated every draggable `::` marker into its parameter caption with consistent spacing, preventing handles from drifting beyond narrow panel edges.
+- Made the sequence Reset command restore the sequence saved in the current preset rather than a generic shape.
+
+### Changed
+
+- Replaced the step-grid context menu with the exact Zero, Max, Min, Random, Reset, Save Sequence, Copy and Paste workflow. Zero respects the bipolar zero crossing, while Min follows the active unipolar or bipolar range.
+- Matched the step-grid context menu to Afterglow's mode-coloured popup styling and reduced its text size slightly for the denser command list.
+- Updated the preset-conversion batch file and instructions to describe both supported external formats.
+
+## 1.55.4 — Hover Help and Compact SEQ — 27 October 2026
+
+### Fixed
+
+- Added hover-driven footer help to every delay dial, including its label and value editor. The hover text reads the current context-sensitive description, so mode-dependent and Tempo Sync controls remain accurate.
+- Restored a step-grid tooltip explaining that steps can be clicked or dragged and that right-click opens the pattern tools.
+- Reduced the SEQ show/hide button from 50 to 36 pixels and centred it beneath the preset-browser action column, keeping it inside the browser panel.
+
+### Changed
+
+- Added hover descriptions for delay-mode, distortion, timing, Freeze, Multi-Tap and power controls alongside the existing adjustment/click feedback.
+
+## 1.55.3 — Sequencer Workflow Polish — 27 October 2026
+
+### Fixed
+
+- Integrated the Stereo Time target handles into the visible `:: L` and `R ::` headings, making the complete headings draggable instead of leaving detached handles beside the knobs.
+- Repositioned the SEQ show/hide control inside the preset-browser panel while the browser is open, without moving it in the normal delay view.
+
+### Changed
+
+- Replaced the SEQ LED-and-label treatment with the same rounded button styling used by the other compact interface actions.
+- Renamed the sequencer `COLOUR` control to `HUE`.
+- Changed Nudge to matching square Previous/Next arrow buttons.
+- Added concise tooltips to every sequencer control except the editable step grid.
+- Assigned delay-target labels now use the live sequencer HUE and SAT colour, immediately identifying every parameter controlled by the sequence.
+
+## 1.55.2 — Sequencer Controls and Clock — 25 October 2026
+
+### Fixed
+
+- Restored dependable target modulation by evaluating the active sequence whenever its ON switch is lit. With no assigned targets the sequence remains harmless, because each parameter still verifies its own target assignment before accepting modulation.
+- Increased the interface refresh from 10 Hz to 30 Hz. This removes the visible pause-and-catch-up aliasing between the GUI timer and fast sequence rates while retaining lightweight grid-only repainting.
+
+### Changed
+
+- Reduced Colour to the same compact 30x30 size as Theme, moved it to the upper panel's right edge and added an adjacent `SAT` knob for independent sequence-colour saturation.
+- Stored sequence saturation beside sequence hue in `Settings.ini`, independently of audio presets.
+- Aligned Host Sync, Waveform, User, the Rate/Start/End groups, range link and Direction around one visual centreline, then reduced the upper panel and expanded-interface heights by six pixels.
+- Changed the sequencer ON LED to the established amber Link colour and Host Sync to the established green Tempo Sync colour.
+- Replaced the Peak and Move circular thumbs with flat yellow tabs and lengthened their vertical rails.
+
+## 1.55.1 — Sequencer Interface and Timing Targets — 25 October 2026
+
+### Fixed
+
+- Restored the moving current-step highlight whenever the sequencer is enabled, including before a modulation target has been assigned.
+- Kept the Stereo and Multi-Tap Time drag handles available under Tempo Sync. A Time target now modulates the displayed millisecond value when Sync is off and the corresponding musical-note division when Sync is on.
+
+### Changed
+
+- Enlarged the upper sequencer panel and returned Colour, Rate, Start, End, Attack and Release to the same 60x57 rotary-control size and shape used by the delay interface.
+- Changed the sequencer rotary indicators to Afterglow's established restrained yellow and made slider value text regular weight while retaining bold control labels.
+- Removed the separate Waveform and User captions. Their selectors now display `WAVEFORM` and `USER` directly when no item is selected.
+- Matched the Waveform, User and Direction selectors to the Mode and Dist Type selectors, including dimensions, fill, text, outline and yellow arrow treatment.
+- Increased the expanded interface height to give the enlarged upper controls proper vertical spacing.
+
+## 1.55.0 — Sequencer Correction — 25 October 2026
+
+### Fixed
+
+- Kept delay parameters completely independent of the sequencer unless it is enabled and has at least one active target. The lightweight sequence clock remains available for the visible current-step indicator, while pattern evaluation and parameter modulation are skipped without an active target.
+- Replaced the unsupported text glyphs used by target-removal and Start/End link controls with native vector icons, so both display consistently on every host and system font configuration.
+
+### Changed
+
+- Moved Rate, Start, End, range link and Direction into the upper sequencer control panel beside Colour, Waveform and User.
+- Moved the centred Nudge controls beneath Attack and Release, enlarged the step area and reduced the expanded interface height.
+- Removed step subdivisions and their saved parameters completely. The 32 main steps now occupy the full grid height.
+- Matched sequencer label and value typography to the delay interface, narrowed the target list and removed the unnecessary lane-A naming throughout the interface.
+- Advanced the saved-state schema to 36. Schema-35 subdivision data is discarded during migration; all main step values, controls and target assignments are retained.
+
+## 1.54.1 — Sequencer Isolation and Layout — 25 October 2026
+
+### Fixed
+
+- Made the sequencer a genuine audio no-op while its switch is off. Stored target assignments now return their untouched Afterglow values instead of being evaluated against a maximum sequence value, eliminating the delay-time and parameter glitches heard with the sequencer disabled.
+- Stopped the free-running pattern and its 32-step pattern calculations while the sequencer is disabled. Target assignments and the current pattern remain stored for reactivation.
+- Drew the Attack/Release transition envelope over the step bars, including the individual values of two- and three-part subdivisions, so their smoothing is visible before listening.
+- Limited Colour to the sequence bars, transition curve and colour knob. Labels, switches, LEDs, general controls and the target list retain their consistent interface colour.
+
+### Changed
+
+- Replaced the Peak and Move rotary controls with the original Seqwencer-style centred vertical sliders and returned them to the right side of the lane-control area.
+- Returned the step-nudge buttons to the lower-left lane position and added a `NUDGE` caption.
+- Narrowed the target list and used the recovered width for the original lane-control arrangement.
+- Removed the separate bottom control panel. Rate, Start, End, range link and Direction now share the enlarged main sequencer panel with the lane controls, steps and targets.
+
+### Compatibility
+
+- Retained state schema 35 and every v1.54.0 sequencer parameter ID. Existing Afterglow presets, user sequences and host automation remain directly compatible.
+
+## 1.54.0 — Sequencer — 25 October 2026
+
+### Added
+
+- Added the complete sequencer workflow from Seqwencer as an expandable lower panel. The new `SEQ` button opens a second panel beneath Afterglow while leaving the established delay-control layout unchanged when closed.
+- Added 32 editable steps, individual Half/Two/Three subdivisions, Start/End range, linked range movement, Loop/Bounce/Reverse/Played/Random directions, host sync, 14 musical rates, Bipolar mode, Attack, Release, Peak and Move.
+- Added the Seqwencer waveform bank, step reset/random/copy/paste/nudge commands and reusable user sequences stored in `Afterglow/Sequences`.
+- Added 16 independently enabled modulation-target slots. Supported Afterglow knob labels can be dragged directly onto the target list, including Stereo and Multi-Tap timing, Feedback, Ducking, Diffusion, Modulation, Pitch, filters, character controls, Dry/Wet and Output.
+- Enabled MIDI input for the Played direction, which restarts the sequencer at the beginning of each newly played phrase.
+- Saved the sequencer panel state, complete pattern, subdivisions, range, controls and target assignments with plugin states and presets. The interface also remembers whether the lower sequencer panel was open and its A Colour setting.
+
+### Fixed
+
+- Kept the selected preset-browser folder visible after loading a preset, including folders below the currently visible part of a long tree.
+- Limited Peak/Move range analysis to subdivisions that are actually active, preventing hidden subdivision values from altering the visible sequence shape.
+
+### Compatibility
+
+- Advanced the saved-state schema to 35. Public schema 32-34 presets are completed with a neutral, unassigned sequencer state when loaded, so existing sounds remain unchanged and cannot inherit modulation targets from the previously loaded preset.
+- Seqwencer's second lane, internal FX and PHI integration are deliberately excluded; Afterglow receives only the single sequencer and its parameter-target workflow.
+
+## 1.53.2 — Stable Preset Browser Position — 24 October 2026
+
+### Fixed
+
+- Kept the selected preset folder visible after loading a preset. Loading from the browser now refreshes only the preset list instead of destroying and rebuilding the complete folder tree, so folders lower in a long hierarchy no longer jump back out of view.
+- When the folder tree genuinely must be rebuilt, it now scrolls the selected folder back into view after restoring the expanded path and selection.
+
+### Compatibility
+
+- Retained saved-state schema 34, every parameter ID, preset format and all plugin DSP from v1.53.1. This release changes preset-browser navigation only.
+
+## 1.53.1 — Correct Clarity Translation — 24 October 2026
+
+### Fixed
+
+- Corrected the new Clarity conversion from Crystal to Digital + Duck. Crystal remains exclusively Afterglow's renamed counterpart to Valhalla Quartz.
+- Retained Clarity's converted Ducking, Mod Amount, Mod Rate, Age, Drive, filtering and all shared timing/feedback parameters while selecting the correct Digital base mode.
+
+### Compatibility
+
+- Retained saved-state schema 34, every parameter ID and all plugin DSP from v1.53.0. Only the one-time Clarity preset translation and displayed version changed.
+
+## 1.53.0 — Complete Mode-Family Preset Translation — 24 October 2026
+
+### Fixed
+
+- Corrected the converter's mode decoder, which previously clamped every Valhalla mode after RevPitch to Pitch Rev. All 17 populated ValhallaDelay 3.0.5 algorithm slots are now recognised.
+- Mapped composite Valhalla modes onto existing Afterglow building blocks instead of adding redundant algorithms: BBDuck to Analogue + Duck, Clarity to Crystal + Duck, DuckTape to Chromatic + Duck, PitchDuck to Pitch + Duck, and RichPitch to Pitch Lush.
+- Mapped the explicit Valhalla `Ducking` preset value directly to Afterglow's Duck control. The supplied Clarity example now converts its 88.4% Ducking setting to 88.4% Duck instead of 0%.
+- Preserved modulation for BBDuck, Clarity, LoFi, Quartz, PhaserDDL and Analog; preserved Wow/Flutter for DuckTape and ChromeTape; and mapped RichPitch's character value to Pitch Mix.
+- Reworded preset-browser help for the established single-click loading behaviour and replaced disk-and-pencil wording with the requested `Save As... button` description.
+
+### Compatibility
+
+- Retained saved-state schema 34, every parameter ID and all v1.52.0 DSP. This release changes one-time conversion and interface wording only.
+
+## 1.52.0 — Hard Clip and Preset Workflow — 24 October 2026
+
+### Added
+
+- Added Hard Clip as a clean, symmetrical distortion type with no noise generator or tone filtering. DIST progressively raises the input gain, lowers the effective clipping threshold and blends the bounded result with the dry input.
+- Extended the one-time converter and Windows launcher to accept ordinary unzipped preset folders as well as ZIP archives. Folder contents are scanned recursively and their hierarchy is retained.
+
+### Fixed
+
+- Extended Lo Cut from 20-2,000 Hz to 10-2,000 Hz and Hi Cut from 1,000-20,000 Hz to 200-20,000 Hz, matching the complete source ranges. The high-pass stage now bypasses exactly at 10 Hz.
+- Updated preset conversion to map both complete filter ranges.
+- Aligned the Theme label vertically with the version label and gave both the same centred alignment behaviour.
+- Changed the two-column preset browser to load the chosen preset on a single click. Keyboard Return loading remains available.
+
+### Compatibility
+
+- Appended Hard Clip after every existing distortion index, preserving the stored selection of all existing presets and states.
+- Retained saved-state schema 34 and every parameter ID. Existing Lo Cut values remain valid without migration.
+
+## 1.51.1 — Preset Conversion Launcher — 24 October 2026
+
+### Fixed
+
+- Shortened the Diff Amt contextual description so its heading and complete help text remain inside the fixed two-line information area at every supported GUI scale.
+
+### Added
+
+- Added a double-clickable Windows preset-conversion launcher and dedicated `Source Presets` / `Converted Presets` folders.
+- The launcher uses the project's portable Python 3.15.1 runtime and converts every Valhalla preset ZIP in one run while retaining each bank's folder structure.
+- Added concise local instructions for supplying source banks and installing the resulting `.agpreset` folders.
+
+### Compatibility
+
+- Retained saved-state schema 34, every parameter ID and all audio processing from v1.51.0.
+
 ## 1.51.0 — Continuous Time-Dependent Processing — 24 October 2026
 
 ### Fixed

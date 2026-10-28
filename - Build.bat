@@ -25,7 +25,7 @@ set "BUNDLE_BINARY=%BUILD_DIR%\Afterglow_artefacts\Release\VST3\Afterglow.vst3\C
 set "FINAL_PLUGIN=%DIST_DIR%\Afterglow.vst3"
 
 echo.
-echo Afterglow 64-bit VST3 - v1.51.0 Build
+echo Afterglow 64-bit VST3 - v1.57.3 Build
 echo ======================================
 echo.
 
@@ -41,7 +41,7 @@ echo.
 echo [1/4] Checking requirements...
 if not exist "%CMAKE_EXE%" goto :missing_cmake
 if not exist "%JUCE_CMAKE%" goto :missing_juce
-for %%F in (CMakeLists.txt PluginProcessor.cpp PluginProcessor.h PluginEditor.cpp PluginEditor.h) do (
+for %%F in (CMakeLists.txt PluginProcessor.cpp PluginProcessor.h PluginEditor.cpp PluginEditor.h AfterglowSequencer.h) do (
     if not exist "%SOURCE_DIR%\%%F" goto :missing_source
 )
 if not exist "%PROJECT_ROOT%Resources\logo.png" goto :missing_logo

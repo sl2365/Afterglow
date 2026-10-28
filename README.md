@@ -13,9 +13,9 @@ Afterglow is a stereo VST3 delay by sl23 for the Dead Channel Audio plugin suite
 
 Credits: Many thanks to Artvera for the logo.
 
-![AGDigital](Resources/AGDigital.jpg)
-![AGAnalogue](Resources/AGAnalogue.jpg)
-![Afterglow](Resources/Afterglow.jpg)
+![Afterglow](Resources/Afterglow1.jpg)
+![Afterglow](Resources/Afterglow2.jpg)
+![Afterglow](Resources/Afterglow3.jpg)
 
 ## Build and installation
 
@@ -152,7 +152,20 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - Dragging the bottom-right corner scales the complete interface from 75% to 200% at a fixed aspect ratio.
 - The last scale and Theme setting are stored globally in `Root\Afterglow\Settings\Settings.ini`, outside audio presets and host project state.
 - The list-icon button hides the inner control panels and contextual-help strip, then opens the browser inside the coloured surround without changing the GUI height. The left 30% presents the folders beneath `Root\Afterglow\Presets` without showing the parent `Presets` folder itself. The preset area uses two name columns beside a vertical column of three matching 26x26 action buttons.
-- Double-click or Return loads a preset. The header arrows or wheel-scrolling the preset field move through the current preset's folder in natural filename order and wrap at both ends. The floppy-disk icon overwrites the current preset, or invokes Save As when no preset has yet been saved or loaded; the floppy-disk-with-pencil icon always creates a new file or copy; and the folder icon opens the selected preset folder. Afterglow presets use the `.agpreset` extension and the current state schema only. The active preset reference survives editor and host-project reopening but is stripped from preset files; Theme, GUI scale and browser state remain global rather than becoming preset data.
+- Single-click or Return loads a preset. Loading a preset keeps the selected browser folder in view. The header arrows or wheel-scrolling the preset field move through the current preset's folder in natural filename order and wrap at both ends. The floppy-disk icon overwrites the current preset, or invokes Save As when no preset has yet been saved or loaded; the floppy-disk-with-pencil icon always creates a new file or copy; and the folder icon opens the selected preset folder. Afterglow presets use the `.agpreset` extension and the current state schema only. The active preset reference survives editor and host-project reopening but is stripped from preset files; Theme, GUI scale and browser state remain global rather than becoming preset data.
+
+## Sequencer
+
+- The `SEQ` button at the lower-right opens or closes a second panel beneath the delay interface. Closing it restores the original GUI height; it does not stop or reset the sequence.
+- The sequencer provides 32 editable steps, Start and End range controls, linked range movement, Left/Right nudge buttons, Loop, Bounce, Reverse, Played and Random directions, and rates from 1/128 to 1/1 including the available triplets.
+- Host Sync, Waveform, User, Rate, Start, End, range link and Direction share one visual centreline in the upper sequencer panel. Compact Colour and Sat knobs at the right set the step hue and saturation independently. The Waveform and User selectors identify themselves directly when empty, while all selectors share the established Mode/Dist Type styling.
+- Click or drag vertically in the main grid to draw step values. Right-click the grid to reset, randomise, copy, paste or save the complete pattern.
+- Attack and Release shape movement into and out of each value; the bright line over the steps shows the resulting transition envelope. The original-style vertical Peak slider expands or compresses the drawn pattern, while the vertical Move slider shifts it up or down. Bipolar permits movement above and below the target's saved value; unipolar treats the target knob as the upper limit.
+- The Waveform menu writes one of 14 ready-made shapes into the grid. Saved `.agseq` patterns are stored in `Root\Afterglow\Sequences` and can be recalled from the User menu.
+- Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Click a target's coloured dot to bypass it without removing it, click its cross to remove it, and use the mouse wheel when the target list contains more rows than can be shown at once.
+- Host Sync follows the DAW timeline. Played direction instead restarts from the first selected step when a new MIDI phrase begins, so Afterglow accepts MIDI input for that trigger mode.
+- Stereo and Multi-Tap Time handles remain assignable under Tempo Sync. The same sequencer target follows the visible control, modulating milliseconds when Sync is off or musical-note divisions when Sync is on.
+- Colour and Sat change only the sequence bars, transition line and their own knobs. Their values are stored in `Settings.ini`, outside audio presets. Turning the sequencer's `ON` switch off completely bypasses target modulation while retaining the pattern and target assignments.
 
 ## Forward development plan
 
@@ -160,8 +173,7 @@ Development now follows this order, one stable feature stage at a time:
 
 1. Reproduce the practical controls, settings, routing choices and audible behaviours of ValhallaDelay as closely as possible, using Afterglow's own implementation and interface. This establishes the complete primary delay foundation first.
 2. After that foundation is working and tested, expand Afterglow with the additional controls, settings and workflow ideas available in Sixth Sample Deelay PE.
-3. Add a flexible LFO and modulation-target system.
-4. Evaluate and, if it remains useful, add a Seqwencer-style step sequencer with drag-and-drop parameter targets.
+3. Add a flexible LFO that can share Afterglow's modulation-target workflow.
 
 The reference products define the functional target; their proprietary code, branding and graphical assets are not copied.
 
