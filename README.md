@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Release](https://img.shields.io/github/v/release/sl2365/Afterglow?style=for-the-badge-square&logo=github&logoColor=white&color=purple)](https://github.com/sl2365/Afterglow/releases/latest/download/Afterglow.rar)
+[![Release](https://img.shields.io/github/v/release/sl2365/Afterglow?style=for-the-badge-square&logo=github&logoColor=white&color=A5AF3C)](https://github.com/sl2365/Afterglow/releases/latest/download/Afterglow.rar)
 [![Release Date](https://img.shields.io/github/release-date/sl2365/Afterglow?style=for-the-badge-square&logo=github&logoColor=white&color=yellow)](https://github.com/sl2365/Afterglow/releases)
 [![Latest Asset Downloads](https://img.shields.io/github/downloads/sl2365/Afterglow/latest/Afterglow.rar?style=for-the-badge-square&logo=github&logoColor=white&label=downloads-latest&displayAssetName=false&color=blue)](https://github.com/sl2365/Afterglow/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/sl2365/Afterglow/total?style=for-the-badge-square&logo=github&logoColor=white&label=downloads-total&color=blue)](https://github.com/sl2365/Afterglow/releases)
