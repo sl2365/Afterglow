@@ -1,5 +1,58 @@
 # Afterglow — Changelog
 
+## 1.60.0 — Relative Sequencer Targets — 28 October 2026
+
+### Changed
+
+- Renamed the visible Sequencer `PEAK` control to `DEPTH` and `MOVE` to `OFFSET`, including their host-visible and target-list names. Their established parameter IDs remain stable so released presets and host projects continue to load normally.
+- Changed DEPTH into a direct 0–100% modulation amount. Zero holds every target at its saved value and 100% supplies the largest available excursion.
+- Updated the Randomise tooltip and result message to match its actual scope: delay controls, sequence steps and target slots are randomised, while sequencer controls, power and Freeze remain unchanged.
+- Widened the DEPTH and OFFSET captions without moving their sliders, keeping their draggable `::` markers fully inside the sequencer control panel.
+
+### Fixed
+
+- Made every target use its saved knob value as the modulation reference. Bipolar sequencing moves equally above and below that value using the nearer available boundary; Unipolar sequencing moves from that value toward the top of the parameter range.
+- Corrected DEPTH and OFFSET processing to operate in the displayed Unipolar 0–1 or Bipolar −1–+1 domain before returning to the sequencer's canonical storage range.
+- Fixed Unipolar Pan and other targets being multiplied by their saved normalised value, which confined modulation to a narrow section of controls positioned near their minimum.
+- Removed the unequal negative/positive Bipolar scaling that made animation appear to change speed on opposite sides of an off-centre target value. A centred Pan target now sweeps symmetrically from hard left through centre to hard right.
+- Advanced saved-state schema to 38 and converted the former signed Peak trim into the equivalent new DEPTH amount. Existing neutral Peak states become 100% DEPTH rather than unexpectedly disabling their sequences.
+
+## 1.59.0 — Sequencer Animation and Converter Calibration — 28 October 2026
+
+### Added
+
+- Added an `ANIMATE` switch to the sequencer. When enabled, assigned delay controls and the assignable Sequencer Attack, Release, Peak and Move controls visually follow the effective modulation value without writing those moving values into the preset or host automation. Disabling it restores the normal static control display immediately.
+
+### Changed
+
+- Moved only the DIFF AMT, DIFF SIZE, MOD AMT and MOD RATE captions three pixels right while retaining their knob and value positions.
+- Made the delay-randomisation control square like the preset Save controls and enlarged its bold `!!!` icon.
+- Changed the Echo Offset track and centre guide to a contrasting light grey.
+
+### Fixed
+
+- Corrected Deelay PE Duck Release conversion using its logarithmic 10–1000 ms source display; a stored midpoint now converts to 100 ms instead of 659 ms.
+- Corrected Deelay PE Mod Rate conversion using its linear 0.02–10 Hz source display; Abstract Concept now converts to 3.0 Hz instead of 0.34 Hz.
+- Stopped discarding Deelay PE Spread when its Mono switch is active. Because Deelay's millisecond time offset and Afterglow's spatial Spread are different controls, the converter now preserves the bipolar source position as the closest available approximation and records that distinction in its conversion notes.
+
+## 1.58.0 — Echo Offset, Delay Randomisation and Preset Colours — 28 October 2026
+
+### Added
+
+- Added a dedicated 0–100% Echo Offset parameter and compact horizontal fader. It offsets the reverse/granular read timing relative to the main delay in Chaotic, Pure Reverse, Chaotic Rev and Forward Rev, including their Multi-Tap paths.
+- Added the `!!!` delay-randomisation button. It randomises the delay controls, Mode, DIST Type and Echo Offset while deliberately leaving the sequencer, power and Freeze untouched. Random Feedback remains below 100% and random Output never exceeds 0 dB for safer auditioning.
+
+### Changed
+
+- Stored Sequencer HUE, SAT and LUM in plugin/preset state rather than `Settings.ini`, allowing every preset to retain its own sequence colour.
+- Moved the closed-browser SEQ button so its right edge aligns with the MIX/OUT panel and placed Echo Offset and Random immediately to its left. The browser-open SEQ position remains unchanged.
+- Evenly spaced Save, Save As, Open Folder and SEQ down the browser action column.
+- Updated the README release-badge colour and screenshot references to `Afterglow1.jpg`, `Afterglow2.jpg` and `Afterglow3.jpg`.
+
+### Fixed
+
+- Corrected Deelay PE conversion so `preset_echoOffset` maps to the dedicated Echo Offset control instead of being misinterpreted as a Right-Time difference. Both Afterglow time channels now retain Deelay PE's displayed Time value.
+
 ## 1.57.3 — Deelay Timing, Tape and Colour Readability — 28 October 2026
 
 ### Changed
