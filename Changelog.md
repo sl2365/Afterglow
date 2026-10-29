@@ -1,5 +1,18 @@
 # Afterglow — Changelog
 
+## 1.70.0 — Phaser Feedback Stability — 29 October 2026
+
+### Fixed
+
+- Corrected an engine-level gain error exposed by the converted `PHASER - Supa Res` preset. Its 3 ms delay, 87.4% Feedback and 30% internal Phaser resonance could produce a worst-case outer-loop gain of approximately 1.056, allowing a slowly swept resonant peak to grow even though Feedback was below 100%.
+- Added a fixed analytical normalisation derived from the Phaser's current internal resonance. It is applied only to the Phaser contribution returning to the outer delay loop; it has no detector, envelope, attack or release and therefore cannot pump.
+- Feedback at 100% now remains nominally unity at the Phaser's worst resonant peak, while settings above 100% retain intentional regenerative and self-oscillating behaviour.
+
+### Preserved
+
+- Kept the audible first echo, internal Phaser resonance, notch sweep, diffusion, filters and wet-output safety unchanged. Diffusion was already after the Phaser/resonance stage; moving it could alter the texture but could not correct the excess loop gain because its all-pass network does not reliably remove energy.
+- Kept every other delay mode, parameter ID, preset value and saved-state schema 38 unchanged. No preset-name exception or conversion compatibility branch was added.
+
 ## 1.69.1 — Uhbik-D Factory v1 Conversion — 29 October 2026
 
 ### Fixed

@@ -79,7 +79,7 @@ Uses a pristine bright digital path with smoothly rounded triangle-wave modulati
 
 ### Phaser
 
-Places a selectable 2/4/6/8/10/12-stage stereo phaser inside the regenerating delay path. Mod Amount controls notch-sweep depth, Mod Rate controls speed, RES controls internal resonance and STAGE changes the notch count. AGE remains visible but disabled. All twelve stages stay warmed and stage changes crossfade smoothly instead of exposing cold filter state or switching abruptly.
+Places a selectable 2/4/6/8/10/12-stage stereo phaser inside the regenerating delay path. Mod Amount controls notch-sweep depth, Mod Rate controls speed, RES controls internal resonance and STAGE changes the notch count. AGE remains visible but disabled. All twelve stages stay warmed and stage changes crossfade smoothly instead of exposing cold filter state or switching abruptly. A fixed resonance-derived gain normalises only the Phaser signal returning to the outer delay loop, so Feedback below 100% remains decaying even when a sweeping resonant peak is stronger than unity; the audible first echo and Phaser resonance remain unattenuated.
 
 ### Pitch Lush
 
