@@ -1,0 +1,36 @@
+AFTERGLOW - EXTERNAL PRESET CONVERTER
+=====================================
+
+Supported preset formats:
+
+   ValhallaDelay: .vpreset
+   Sixth Sample Deelay PE: .sspreset
+   u-he ColourCopy: .h2p
+
+1. Put every supported preset ZIP or unzipped preset folder you want to convert into:
+
+   Preset Converter\Source Presets
+
+2. Double-click:
+
+   Convert All Presets.bat
+
+3. The converted banks will appear inside:
+
+   Preset Converter\Converted Presets
+
+   Each source ZIP or folder receives its own output folder, so several banks can be
+   converted together without overwriting one another.
+
+4. Copy the converted preset folders into the Afterglow\Presets folder beside
+   the installed Afterglow.vst3 file. Afterglow will show the original folder
+   hierarchy in its preset browser.
+
+You can also drag one or more supported preset files, ZIP files or preset folders
+directly onto Convert All Presets.bat. Subfolders are scanned recursively, so the
+original preset hierarchy is retained without needing to create an archive first.
+The converter uses only the portable Python runtime at:
+
+   _Projects\_Tools\python\_3.15.1\python.exe
+
+Nothing is installed and no system Python configuration is required.

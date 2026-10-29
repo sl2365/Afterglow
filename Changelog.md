@@ -1,5 +1,86 @@
 # Afterglow — Changelog
 
+## 1.68.0 — 1/128 Timing — 29 October 2026
+
+### Added
+
+- Added 1/128 as the shortest Stereo and Multi-Tap tempo-sync division, ahead of 1/64 triplet in the musically ordered timing range.
+- Updated the external preset converter so all newly converted ValhallaDelay, Deelay PE and ColourCopy presets use the revised timing indices.
+
+### Changed
+
+- Shifted the established Stereo and Multi-Tap division indices up by one to accommodate 1/128 at the correct start of the list.
+- Adjusted all 737 supplied Afterglow presets by changing only `divisionL`, `divisionR` and the four `tapNDivision` values. Every timing value therefore retains the exact musical duration it had before 1/128 was inserted.
+- Shifted new-instance Stereo and Multi-Tap division defaults to their equivalent revised indices.
+
+### Compatibility
+
+- No runtime migration or backwards-compatibility branch was added. Presets outside the supplied adjusted bank and plugin states embedded in existing DAW projects must be corrected manually if they use tempo-synchronised timing.
+- Retained saved-state schema 38 and every parameter ID.
+
+## 1.67.0 — Sequencer Range Targets and Extended Timing — 29 October 2026
+
+### Added
+
+- Made the Sequencer START and END labels draggable modulation targets. Their stored values remain the reference points, while the previous stable sequence value moves the active playback range without creating a circular current-step dependency.
+- Added 2/1, 3/1 and 4/1 timing choices to Stereo and Multi-Tap tempo sync. All three were appended after 1/1, preserving every existing timing index and saved preset exactly.
+- Increased the delay capacity from 8 to 16 seconds so 4/1 remains available down to 60 BPM instead of being silently truncated at ordinary slower tempos.
+- Added a contextual-help heading and description for the Preset Browser button.
+
+### Changed
+
+- Set new-instance Sequencer HUE, SAT and LUM defaults and double-click resets to 50%.
+- Replaced generic `AFTERGLOW` and `SEQUENCER` contextual-help headings with the hovered control name throughout the interface.
+- Echo Offset now visibly greys out, including its guide, handle and label, whenever the selected mode does not use it.
+
+### Preserved
+
+- Deliberately left 1/128 out rather than appending it in an illogical position or shifting the established division indices used by existing presets and automation.
+- Appended START and END after every established Sequencer target choice, retaining all existing target indices and preset assignments.
+- Retained saved-state schema 38 and every parameter ID without conversion logic.
+
+## 1.66.0 — ColourCopy Preset Conversion — 29 October 2026
+
+### Added
+
+- Added one-time conversion of u-he ColourCopy `.h2p` preset files to Afterglow presets. The existing converter accepts individual files, unzipped banks and ZIP banks while retaining their folder structure.
+- Added exact parsing of ColourCopy's 21 TIME BASE choices and its quarter-speed to four-times-speed RATE scaling. Left and Right tap positions are materialised into Afterglow's independent timing controls.
+- Added direct or closest available mappings for Regen, feedback routing, Width, time-based LFO targets, continuous Colour position, Saturation, Brightness, AMP ducking, Mix and Output.
+
+### Conversion boundaries
+
+- Feedback-only ducking, AMP LFO modulation, input routing and gain, feedback phase inversion, dynamic LFO behaviour, noise-floor selection and MIDI Note Control are reported rather than silently assigned to unrelated controls.
+- ColourCopy's independent tap position and full feedback-loop period cannot both be represented by Afterglow's single timing value per channel. The audible first taps are retained and the difference is recorded in each conversion report.
+- ColourCopy's triangle LFO and continuously variable stereo phase use the nearest available Afterglow sine/phase behaviour, with every approximation written to the report.
+
+### Preserved
+
+- Kept the restored v1.65.2 Colour AGE character and all delay DSP unchanged. This release changes only the external one-time preset converter plus displayed version metadata.
+- Retained saved-state schema 38 and all parameter IDs without preset migration code.
+
+## 1.65.2 — Colour AGE Character Restore — 29 October 2026
+
+### Changed
+
+- Removed the v1.64.1 feedback-level restoration from Colour. Strong AGE settings once again retain their original, more obvious cumulative loss and character instead of compensating that behaviour away inside the feedback loop.
+
+### Preserved
+
+- Kept Colour's AGE companding, bandwidth softening, texture and asymmetric saturation exactly as introduced in v1.64.0.
+- Kept the v1.65.0 virtual-clock modulation, manual Time movement, cubic interpolation and every other mode unchanged.
+- Retained saved-state schema 38 and all parameter IDs without conversion logic.
+
+## 1.65.1 — Bipolar Sequencer Depth — 29 October 2026
+
+### Fixed
+
+- Restored DEPTH as a bipolar sequence-shape control. Negative values shrink the complete curve, 0% preserves the curve exactly and positive values expand smaller curves towards the available Unipolar or Bipolar boundary.
+- Restored the centre detent and 0% double-click reset on the DEPTH slider while retaining the clearer DEPTH name and target-relative modulation introduced in v1.60.0.
+
+### Preserved
+
+- Kept saved-state schema 38 and the established `sequencerPeak` parameter ID. No conversion or compatibility branch was added because no presets use the temporary unipolar DEPTH behaviour.
+
 ## 1.65.0 — Colour Clock Modulation — 29 October 2026
 
 ### Changed

@@ -117,7 +117,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - The `MULTI` LED in the Timing panel switches between the normal stereo timing page and a compact four-tap page without discarding either page's settings.
 - Each of the four taps has its own Time, bipolar Pan, Volume and numbered On LED. The tap number is drawn inside the switch itself, removing the redundant row-number column. A single global `SYNC` LED changes all four Time knobs between their independently stored millisecond values and musical divisions, which keeps rhythmic patterns coherent while retaining per-tap timing.
 - Multi-tap page changes, tap enable changes, time movement, pan and volume are smoothed. Active tap levels use fixed RMS normalisation, preventing a four-tap pattern from creating an uncontrolled level jump without introducing envelope pumping.
-- Dedicated Left and Right Tempo Sync LEDs let either channel use milliseconds or musical note divisions independently. Straight, dotted and triplet choices are available through 1/64 and are ordered shortest-to-longest.
+- Dedicated Left and Right Tempo Sync LEDs let either channel use milliseconds or musical note divisions independently. Straight choices run from 1/128 through 4/1; dotted and triplet choices begin at 1/64.
 - Link L/R makes the disabled Right Time knob follow the complete Left timing state—value and free/synced interpretation—without overwriting Right's stored millisecond, note-division or sync setting. Unlinking restores all three Right settings.
 - Switching either Tempo Sync LED never converts or overwrites that channel's stored millisecond and note values.
 
@@ -159,6 +159,8 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 ### Editing and contextual information
 
 - The fixed two-line contextual information area occupies the lower-left 683 design pixels inside the coloured surround. The lower-right area beneath the last two panels remains clear for future buttons, and the eight-pixel bottom margin matches the side margins.
+- Hover help identifies the actual control in its first line instead of using a generic Afterglow or Sequencer heading. The Preset Browser button is included.
+- Echo Offset is active only in the Chaotic and reverse-family modes that use it; its label, guide and handle visibly dim elsewhere.
 - Rotary value fields retain their normal appearance, while clicking one opens an 18-pixel-high editor that displays the complete typed value without clipping its lower edge.
 - Top-right Power indicator uses a clearer green illumination while processing is active and remains unlit while bypassed. Host bypass automation remains conventional, uses a smoothed dry/processed transition and leaves the delay engine running.
 
@@ -194,7 +196,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 ### Opening, clock and playback
 
 - The `SEQ` button at the lower-right opens or closes a second panel beneath the delay interface. Closing it restores the original GUI height; it does not stop or reset the sequence.
-- The sequencer provides 32 editable steps, Start and End range controls, linked range movement, Left/Right nudge buttons, Loop, Bounce, Reverse, Played and Random directions, and rates from 1/128 to 1/1 including the available triplets.
+- The sequencer provides 32 editable steps, draggable Start and End range targets, linked range movement, Left/Right nudge buttons, Loop, Bounce, Reverse, Played and Random directions, and rates from 1/128 to 1/1 including the available triplets.
 - Host Sync follows the DAW timeline. Played direction instead restarts from the first selected step when a new MIDI phrase begins, so Afterglow accepts MIDI input for that trigger mode.
 
 ### Drawing and pattern tools
@@ -205,16 +207,16 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 ### Modulation range and targets
 
-- A target control's saved value is its modulation reference. `DEPTH` controls the modulation excursion, while `OFFSET` moves the complete sequence shape up or down without changing that shape.
+- A target control's saved value is its modulation reference. Bipolar `DEPTH` scales the complete sequence shape: negative values shrink it, 0% leaves the drawn curve unchanged and positive values expand a smaller curve towards the available Unipolar or Bipolar limit. `OFFSET` moves the resulting shape up or down without changing it.
 - In Bipolar mode, the saved target value is the centre and modulation moves equally above and below it, limited by the nearer parameter boundary. In Unipolar mode, the saved target value is the starting point and positive steps move from it towards the parameter maximum.
 - Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Click a target's coloured dot to bypass it without removing it, click its cross to remove it, and use the mouse wheel when the target list contains more rows than can be shown at once.
 - Stereo and Multi-Tap Time handles remain assignable under Tempo Sync. The same sequencer target follows the visible control, modulating milliseconds when Sync is off or musical-note divisions when Sync is on.
-- Attack, Release, DEPTH and OFFSET can also be assigned as targets. Their current block uses the preceding evaluated sequence value to avoid a circular modulation dependency.
+- Attack, Release, DEPTH, OFFSET, START and END can also be assigned as targets. These sequencer controls use the preceding evaluated sequence value to avoid a circular modulation dependency.
 
 ### Display, colour and saved state
 
 - Host Sync, Waveform, User, Rate, Start, End, range link and Direction share one visual centreline in the upper sequencer panel. The Waveform and User selectors identify themselves directly when empty, while all selectors share the established Mode/Dist Type styling.
-- `HUE` and `SAT` set the sequence colour and readable target highlights. `LUM` adjusts the step display only, preventing assigned-target labels and the colour knobs from becoming too dark to read.
+- `HUE` and `SAT` set the sequence colour and readable target highlights. `LUM` adjusts the step display only, preventing assigned-target labels and the colour knobs from becoming too dark to read. All three default and double-click reset to 50%.
 - `ANIMATE` makes assigned controls visually follow their effective sequenced values without changing their stored values or writing host automation. Turning it off immediately returns every control display to its saved position while audible modulation continues.
 - Steps, targets, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. ANIMATE and whether the sequencer panel is open remain global interface preferences.
 - Turning the sequencer's `ON` switch off completely bypasses target modulation while retaining the pattern and target assignments.

@@ -1,0 +1,3 @@
+Place one or more ValhallaDelay, Deelay PE or ColourCopy preset ZIP files or
+unzipped preset folders here, then double-click Convert All Presets.bat in the
+parent folder.
