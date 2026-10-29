@@ -6,6 +6,7 @@ Supported preset formats:
    ValhallaDelay: .vpreset
    Sixth Sample Deelay PE: .sspreset
    u-he ColourCopy: .h2p
+   u-he Uhbik Delay / Uhbik-D: .h2p
 
 1. Put every supported preset ZIP or unzipped preset folder you want to convert into:
 
@@ -29,6 +30,7 @@ Supported preset formats:
 You can also drag one or more supported preset files, ZIP files or preset folders
 directly onto Convert All Presets.bat. Subfolders are scanned recursively, so the
 original preset hierarchy is retained without needing to create an archive first.
+The Python converter used by the batch file is named preset_converter.py.
 The converter uses only the portable Python runtime at:
 
    _Projects\_Tools\python\_3.15.1\python.exe

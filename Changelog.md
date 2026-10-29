@@ -1,5 +1,36 @@
 # Afterglow — Changelog
 
+## 1.69.1 — Uhbik-D Factory v1 Conversion — 29 October 2026
+
+### Fixed
+
+- Recognised the older `#AM=Uhbik-D` product identifier used by the Uhbik Factory v1 bank as the same supported delay format as the newer `#AM=Uhbik Delay` identifier.
+- Unsupported u-he `.h2p` products inside a mixed source folder or ZIP are now identified as skipped in `Conversion Notes.txt` instead of aborting conversion of the complete bank. A source containing no supported presets still fails clearly rather than reporting a false successful conversion.
+
+### Preserved
+
+- Kept all v1.69.0 Uhbik parameter mappings, delay DSP, parameters and saved-state schema 38 unchanged.
+
+## 1.69.0 — Uhbik Delay Preset Conversion — 29 October 2026
+
+### Added
+
+- Added one-time conversion of u-he Uhbik Delay `.h2p` presets from individual files, unzipped folder trees or ZIP banks while retaining their source hierarchy.
+- Converted the four strongest audible Uhbik taps into Afterglow Multi-Tap timing, Pan and Level. Uhbik's global Speed is materialised into each musical tap position before it is matched to the nearest Afterglow tempo division.
+- Added direct or closest mappings for Feedback, Low/High Cut, Soft Clip, Mix, Output and bypass.
+- Converted Uhbik's built-in smooth LFO to MOD AMT/RATE and its irregular Flutter to WOW/FLUTTER. Autonomous modulation-matrix LFO or Mod Noise assignments to Speed or tap time add conservative approximate movement.
+
+### Conversion boundaries
+
+- Afterglow has four tap heads rather than five. The least audible source head is omitted and identified in each conversion report.
+- Uhbik's per-tap feedback selectors form a separate feedback-head topology and can remain active on inaudible taps. Afterglow has one shared Multi-Tap feedback loop, so the source selection is reported rather than assigned to unrelated switches.
+- Arbitrary MIDI, envelope, Mapper, Pan, gain and filter modulation routes, continuously variable tap positions between Afterglow divisions, and Uhbik's separate Input/Wet gains have no direct equivalents. Every material omission or approximation is written to `Conversion Notes.txt`.
+
+### Changed
+
+- Renamed the general external-preset script from `valhalla_to_afterglow.py` to `preset_converter.py` and updated the Windows batch launcher and instructions.
+- Kept all delay DSP, parameters and saved-state schema 38 unchanged; this release changes only the offline converter and displayed version metadata.
+
 ## 1.68.0 — 1/128 Timing — 29 October 2026
 
 ### Added

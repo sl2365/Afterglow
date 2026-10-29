@@ -4,7 +4,7 @@ title Afterglow - Convert External Presets
 
 set "CONVERTER_DIR=%~dp0"
 set "PYTHON_EXE=%CONVERTER_DIR%..\..\_Tools\python\_3.15.1\python.exe"
-set "CONVERTER_SCRIPT=%CONVERTER_DIR%valhalla_to_afterglow.py"
+set "CONVERTER_SCRIPT=%CONVERTER_DIR%preset_converter.py"
 set "SOURCE_DIR=%CONVERTER_DIR%Source Presets"
 set "OUTPUT_ROOT=%CONVERTER_DIR%Converted Presets"
 set "CONVERTED_COUNT=0"
@@ -83,7 +83,7 @@ exit /b 0
 :no_sources
 echo No source preset ZIP files or unzipped folders were found.
 echo.
-echo Put every Valhalla, Deelay PE or ColourCopy preset ZIP or folder into:
+echo Put every Valhalla, Deelay PE, ColourCopy or Uhbik Delay preset ZIP or folder into:
 echo   %SOURCE_DIR%
 echo.
 echo Then double-click this batch file again.
