@@ -1,5 +1,91 @@
 # Afterglow — Changelog
 
+## 1.65.0 — Colour Clock Modulation — 29 October 2026
+
+### Changed
+
+- Routed Colour's MOD, WOW and FLUTTER movement into the same responsive virtual-clock targets used by manual Left and Right Time changes. Modulation now follows the approved continuous transport trajectory before cubic interpolation rather than being added afterwards.
+- Gave every Multi-Tap Colour head independent Left and Right clock state so stereo modulation follows the same bounded movement model as the main Stereo timing path.
+- Shortened the contextual descriptions that could wrap onto a third line, including DIFF SIZE and Colour AGE, so the fixed information strip no longer clips their top or bottom edges.
+
+### Preserved
+
+- Kept Colour's manual Time response, cubic reader, AGE character, feedback-length correction and audible wet level unchanged.
+- Retained the 0.25x-4x Colour playback bounds for automated movement, preventing deep or fast modulation from stalling, reversing or teleporting a read head.
+- Left every other mode's established MOD, WOW and FLUTTER behaviour unchanged, with saved-state schema 38 and all parameter IDs intact.
+
+## 1.64.1 — Colour AGE Feedback — 29 October 2026
+
+### Fixed
+
+- Restored part of the circulation loss introduced by strong Colour AGE settings. Fully coloured repeats now retain more feedback presence and decay instead of becoming disproportionately short or weak.
+
+### Preserved
+
+- Left the audible first echo and wet-output level unchanged; correction applies only to the recirculating Colour signal.
+- Defined the sub-unity correction as a fraction of the remaining distance to unity. It is mathematically unable to cross unity below 100% Feedback and fades to zero at and above 100% and during Freeze, preserving the established self-oscillation and captured-loop behaviour.
+- Used a fixed AGE/Feedback curve with no envelope follower, attack, release or time-varying gain, so the correction cannot pump.
+- Retained saved-state schema 38 and every parameter ID without migration code.
+
+## 1.64.0 — Colour Character — 29 October 2026
+
+### Added
+
+- Added a dedicated repeat-character path to Colour. AGE now morphs from the exact clean cubic delay at 0% into restrained companding, progressively softer two-stage bandwidth, very low signal-tracked texture and asymmetric saturation.
+- Applied the same Colour character model to Stereo and Multi-Tap timing, with independent stereo state and stable preallocated processing.
+
+### Changed
+
+- Placed Colour's character before the shared EQ, diffusion and feedback routing so each circulation accumulates the selected tone naturally instead of applying a cosmetic filter only to the final output.
+- Enabled AGE in Colour and added mode-specific contextual help describing its clean-to-coloured range.
+
+### Preserved
+
+- Kept the v1.63.0 virtual-clock trajectory, 0.25x-4x movement bounds, cubic interpolation, Left/Right timing behaviour and all other modes unchanged.
+- Kept AGE 0% mathematically on the direct Colour read. The new compander, filters, texture and saturation remain fully blended out at that setting.
+- Retained saved-state schema 38 and all existing parameter IDs. Colour uses the established AGE parameter, so no new compatibility or migration code was added.
+
+## 1.63.0 — Colour Transport — 29 October 2026
+
+### Added
+
+- Added the `Colour` delay mode with independent Left and Right virtual-clock read heads. Time changes now create a continuous Doppler transition rather than a fixed-head crossfade.
+- Added a dedicated four-point cubic delay reader for Colour. Both sample value and slope remain continuous as its read heads move, improving clarity during slow sweeps, quick changes and direction reversals.
+- Extended the same Colour transport and interpolation to Multi-Tap timing.
+
+### Changed
+
+- Bounded Colour's effective moving-head playback range from 0.25x to 4x and added short velocity easing. The heads follow active Time gestures promptly without Tape II's deliberately slower mechanical inertia, while large discontinuous changes cannot stall, reverse or teleport the read position.
+- Added Colour to the alphabetised Mode menu with a subdued warm-brown mode theme and context-sensitive help.
+
+### Preserved
+
+- Kept Colour's first stage deliberately clean, without fixed drift, noise, saturation or head loss. Existing Mod, Wow, Flutter, EQ, DIST, feedback, Link, Tempo Sync and Ping-Pong controls remain available.
+- Appended Colour after every released mode, retaining all existing mode indices, parameter IDs, preset meanings and saved-state schema 38 without a migration layer.
+
+## 1.62.0 — Regenerative Feedback Colour — 29 October 2026
+
+### Changed
+
+- Added a common unity-slope saturation after every mode's existing feedback processing. It remains completely bypassed through 100% Feedback, then fades in smoothly across the displayed 100-200% regenerative range.
+- Gave loud self-oscillation a denser harmonic shape and lower common large-signal headroom without adding automatic reverb, diffusion, an envelope follower or mode-specific preset exceptions.
+
+### Preserved
+
+- Kept the complete 0-100% Feedback curve, ordinary preset sound, decay calibration, small-signal regenerative gain, per-mode colour, Freeze capture and v1.61.0 stereo-linked wet-output safety unchanged.
+
+## 1.61.0 — Stereo-Linked Wet Safety — 29 October 2026
+
+### Changed
+
+- Replaced the former per-channel output soft clip, which permitted wet peaks up to +3.5 dBFS, with a stereo-linked static safety knee on the actual audible wet pair.
+- Kept the safety stage exactly transparent below -2 dBFS and placed its asymptotic sample ceiling at -0.5 dBFS. MIX and OUT remain afterwards, retaining intentional output-level control.
+
+### Fixed
+
+- Prevented extreme Feedback and DIST combinations from creating unexpectedly excessive wet output while leaving the Feedback curve, feedback-loop duration, per-mode processing, Freeze and ordinary preset levels unchanged.
+- Applied one shared instantaneous gain to both wet channels, preserving the stereo image without an envelope follower, attack/release behaviour or compressor pumping.
+
 ## 1.60.0 — Relative Sequencer Targets — 28 October 2026
 
 ### Changed
