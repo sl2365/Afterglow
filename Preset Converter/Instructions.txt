@@ -7,6 +7,7 @@ Supported preset formats:
    Sixth Sample Deelay PE: .sspreset
    u-he ColourCopy: .h2p
    u-he Uhbik Delay / Uhbik-D: .h2p
+   Yum Audio LoFi Playtime: .lofiplaytimepreset
 
 1. Put every supported preset ZIP or unzipped preset folder you want to convert into:
 

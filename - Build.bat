@@ -25,7 +25,7 @@ set "BUNDLE_BINARY=%BUILD_DIR%\Afterglow_artefacts\Release\VST3\Afterglow.vst3\C
 set "FINAL_PLUGIN=%DIST_DIR%\Afterglow.vst3"
 
 echo.
-echo Afterglow 64-bit VST3 - v1.70.0 Build
+echo Afterglow 64-bit VST3 - v1.77.0 Build
 echo ======================================
 echo.
 

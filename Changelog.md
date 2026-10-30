@@ -1,5 +1,107 @@
 # Afterglow — Changelog
 
+## 1.77.0 — Twin Tape Timing Cleanup — 30 October 2026
+
+### Changed
+
+- Hidden both the `MULTI` label and its LED selector while Twin Tape is selected, rather than displaying a control that cannot be used in that mode.
+- Preserved the complete stored Multi-Tap setup. Selecting any other mode restores the selector and its previous state without changing its parameters.
+
+### Preserved
+
+- Left all audio processing, Twin Tape transport and character, preset conversion, parameter IDs and saved-state schema 39 unchanged.
+
+## 1.76.0 — LoFi Playtime Preset Conversion — 29 October 2026
+
+### Added
+
+- Added Yum Audio LoFi Playtime `.lofiplaytimepreset` files to the external preset converter for individual files, unzipped folder trees and ZIP banks.
+- Mapped every directly corresponding source value to Twin Tape: shared free/synchronised Basetime, both speeds and directions, independent Age, Shine and Gain, Feedback, Spread, Mix and Freeze. Source note indices are advanced past Afterglow's later 1/128 entry so their audible divisions remain unchanged.
+- Updated generated preset XML to complete current schema-39 states, including neutral sequencer values and the Twin Tape parameters. New conversions no longer masquerade as schema 34 or rely on compatibility migration to fill newer controls.
+- Added explicit conversion notes for every Playtime head and for values outside Afterglow's available range.
+
+### Changed
+
+- Updated the portable converter batch and instructions to recognise Playtime presets alongside the existing formats.
+- When a 0%-Spread Playtime preset disables one tape, the converter mirrors the enabled transport into Afterglow's second averaged head. This preserves the intended single pitch/reverse layer without leaking an unrelated head; the report identifies the approximation because Twin Tape has no per-head power parameter.
+
+### Preserved
+
+- Left the v1.75.0 Twin Tape audio engine, approved pitch and reverse transports, Feedback and every existing preset conversion unchanged.
+
+## 1.75.0 — Twin Tape Age — 29 October 2026
+
+### Changed
+
+- Rebuilt the independent `AGE I` and `AGE II` response around their intended tape-wear role. Each head now develops clearly audible but separately moving slow warble, wandering speed error and restrained faster flutter, producing the expected two-tape chorus instead of a nearly inert control.
+- Changed dropouts from a tiny continuous attenuation into bounded wear events that become more evident towards the top of AGE without muting a head or destabilising Feedback. Raised signal-tracking texture and soft tape compression enough to make the complete control range useful.
+- Separated per-head AGE from the SHINE cutoff calculation. SHINE retains the established approved brightness response, while AGE no longer needs to darken the head before its movement can be heard.
+
+### Preserved
+
+- Left the approved v1.72.0 forward pitch transport, v1.74.0 reverse transport, Freeze, Feedback, both character pages and every non-Twin mode unchanged.
+- Retained saved-state schema 39 and every parameter ID; existing presets keep their exact values.
+
+## 1.74.0 — Twin Tape Reverse Transport — 29 October 2026
+
+### Changed
+
+- Reverted Twin Tape's complete forward Slow/Normal/Fast path to the approved v1.72.0 fixed-window implementation. The v1.73.0 timing-linked window did not retain the preferred musical pitch-shifted echo and has been removed rather than kept as a compatibility path.
+- Rebuilt only Twin Tape's live Reverse timing around longer, speed-aware Hann-overlapped loops. Reverse Normal now spans one selected Time, Reverse Slow spans two Times and Reverse Fast spans half a Time while retaining their established 1x, 0.5x and 2x reverse pitch rates.
+- Routed reverse Time changes through the responsive Colour-style virtual transport before calculating each splice. Manual or automated Time movement now eases continuously into the reverse loop instead of rigidly rescaling every grain directly from the knob.
+
+### Preserved
+
+- Left the approved v1.72.0 forward pitch character, both character pages, Freeze, Feedback, per-head processing and every non-Twin mode unchanged.
+- Retained saved-state schema 39 and every parameter ID. No obsolete forward algorithm or compatibility selector remains.
+
+## 1.73.0 — Twin Tape Transport Calibration — 29 October 2026
+
+### Changed
+
+- Calibrated Twin Tape's forward transport from the supplied clean and eight-state continuous reference recording at a 505 ms Basetime. Slow and Fast retain their exact half-speed and double-speed octave shifts.
+- Replaced Twin Tape's inherited fixed 80 ms forward pitch window with a dedicated window equal to half of the active head Time. At the recorded 505 ms setting, Slow now renews at approximately 505 ms and Fast at approximately 252.5 ms, matching the measured reference motion instead of producing an unrelated dense granular rate.
+- Kept the established Hann-overlapped, click-resistant pitch path, per-head character, shared character page and feedback topology. Only Twin Tape's forward splice period changed; the normal and reverse transports are untouched.
+
+### Preserved
+
+- Retained saved-state schema 39 and every parameter ID. This is an engine calibration with no preset conversion or compatibility branch.
+
+## 1.72.0 — Twin Tape Character Pages — 29 October 2026
+
+### Added
+
+- Added an amber LED page switch between Twin Tape's independent `AGE I`/`SHINE I`/`AGE II`/`SHINE II` controls and the original `DIST`/shared `AGE`/`WOW`/`FLUTTER` controls. Switching pages changes only the visible attachments; every value remains live and untouched.
+- Enabled the established input Distortion circuit and all sixteen Dist Types in Twin Tape instead of silently forcing DIST to zero.
+- Added a shared Twin Tape AGE stage. It applies restrained common bandwidth wear and level-compensated asymmetric tape saturation after each head's independent Age and Shine processing.
+
+### Preserved
+
+- WOW and FLUTTER already moved the Twin Tape read heads through the common click-resistant modulation path; they are now visible on the alternate page without changing that established DSP.
+- Retained saved-state schema 39 and every existing parameter ID. The panel selector is an editor view choice rather than a preset parameter, so it adds no compatibility branch or redundant saved state.
+
+## 1.71.0 — Twin Tape — 29 October 2026
+
+### Added
+
+- Added the `Twin Tape` mode after every existing mode, retaining all released mode indices. It runs two independent windowed virtual-tape heads using the Left and Right Time controls as their cycle lengths.
+- Added six click-resistant speed/direction states per head: Reverse Fast, Reverse Normal, Reverse Slow, Slow, Normal and Fast. Slow and Fast use approximately half- and double-speed playback for octave-down and octave-up layering.
+- Added independent Age, Shine and Gain parameters for both tape heads. Age supplies separately moving warble, restrained dropouts, signal-tracking texture and soft tape saturation; Shine controls per-head bandwidth before the heads are mixed and regenerated.
+- Added Twin Tape stereo routing to Spread. At 0% both heads remain complete stereo layers; positive and negative extremes assign the heads to opposite sides in either order.
+- Added a dedicated preallocated Twin Tape Freeze capture. Each head retains its own captured cycle and remains responsive to speed, direction, Age, Shine and Gain while frozen.
+- Added all eight Twin Tape controls to the sequencer target list and saved-state schema 39.
+
+### Interface
+
+- Added Twin Tape to the alphabetised Mode selector with its own muted rose-brown theme colour and two-line contextual help.
+- Reused existing panels only while Twin Tape is selected: SHIFT/DETUNE become `TAPE I`/`TAPE II`; DIST/AGE/WOW/FLUTTER become the four Age/Shine controls; HI CUT/LO CUT become `GAIN I`/`GAIN II`. The stored controls return unchanged when another mode is selected.
+- Multi-Tap remains stored but is visibly unavailable in Twin Tape because the two tape heads already provide its parallel timing topology.
+
+### Preserved
+
+- Appended the new mode and parameters without changing any established mode index, parameter ID or preset meaning. Schema 32-38 states receive neutral Twin Tape defaults when loaded.
+- Kept every existing delay algorithm and its DSP unchanged.
+
 ## 1.70.0 — Phaser Feedback Stability — 29 October 2026
 
 ### Fixed

@@ -136,6 +136,16 @@ UHBIK_NOISE_SOURCE = 9
 UHBIK_TIME_TARGETS = frozenset(
     ("Dly1:Speed",) + tuple(f"Dly1:Dly{tap}" for tap in range(1, 6)))
 
+SUPPORTED_PRESET_SUFFIXES = (
+    ".vpreset", ".sspreset", ".h2p", ".lofiplaytimepreset",
+)
+
+# LoFi Playtime predates Afterglow's 1/128 addition and stores the selected
+# host-synchronised note as a zero-based choice from 1/64 triplet through 4/1.
+# Every source choice therefore moves one slot to retain the same audible time.
+PLAYTIME_DIVISION_OFFSET = 1
+PLAYTIME_SPEED_NAMES = ("Slow", "Normal", "Fast")
+
 # Era is not one global distortion selector in ValhallaDelay.  It changes
 # hardwired details inside each algorithm.  These choices materialise the
 # closest available Afterglow DIST family without changing the directly
@@ -214,7 +224,26 @@ def defaults() -> list[tuple[str, float]]:
         ("mode", 0.0), ("distortionType", 0.0),
         ("drive", 0.0), ("age", 30.0),
         ("wow", 0.0), ("flutter", 0.0),
+        ("twinTapeSpeed1", 4.0), ("twinTapeSpeed2", 4.0),
+        ("twinTapeAge1", 20.0), ("twinTapeShine1", 100.0),
+        ("twinTapeAge2", 20.0), ("twinTapeShine2", 100.0),
+        ("twinTapeGain1", 0.0), ("twinTapeGain2", 0.0),
+        ("sequencerEnabled", 1.0), ("sequencerHostSync", 1.0),
+        ("sequencerRate", 6.0), ("sequencerStart", 1.0),
+        ("sequencerEnd", 32.0), ("sequencerRangeLink", 0.0),
+        ("sequencerDirection", 0.0), ("sequencerBipolar", 0.0),
+        ("sequencerAttack", 0.0), ("sequencerRelease", 0.0),
+        ("sequencerPeak", 0.0), ("sequencerMove", 0.0),
+        ("sequencerHue", 0.5), ("sequencerSaturation", 0.5),
+        ("sequencerLuminance", 0.5),
     ))
+    for step in range(1, 33):
+        values.append((f"seqStep{step}", 1.0))
+    for slot in range(1, 17):
+        values.extend((
+            (f"seqTarget{slot}", 0.0),
+            (f"seqTargetEnabled{slot}", 1.0),
+        ))
     return values
 
 
@@ -232,6 +261,22 @@ def source_float(attributes: dict[str, str], name: str, fallback: float) -> floa
     except (TypeError, ValueError):
         return fallback
     return value if math.isfinite(value) else fallback
+
+
+def source_float_alias(attributes: dict[str, str], names: tuple[str, ...],
+                       fallback: float) -> float:
+    """Read the first populated finite value from renamed source fields."""
+    for name in names:
+        raw = attributes.get(name)
+        if raw is None or not str(raw).strip():
+            continue
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            return value
+    return fallback
 
 
 def parse_uhe(data: bytes) -> tuple[str, dict[str, dict[str, str]]]:
@@ -377,7 +422,7 @@ def format_value(value: float) -> str:
 
 
 def build_target(values: dict[str, float]) -> ET.Element:
-    root = ET.Element("AfterglowParameters", {"schemaVersion": "34"})
+    root = ET.Element("AfterglowParameters", {"schemaVersion": "39"})
     for parameter_id, _ in defaults():
         ET.SubElement(root, "PARAM", {
             "id": parameter_id,
@@ -872,6 +917,131 @@ def convert_colourcopy(attributes: dict[str, str]) -> tuple[ET.Element, list[str
     return build_target(values), notes
 
 
+def playtime_speed_code(speed: float, reverse: bool) -> int:
+    """Map Slow/Normal/Fast plus Reverse to Twin Tape's six choices."""
+    source_speed = min(2, max(0, int(round(speed))))
+    return 2 - source_speed if reverse else 3 + source_speed
+
+
+def convert_playtime(source: ET.Element) -> tuple[ET.Element, list[str]]:
+    if source.tag != "PARAMS":
+        raise ValueError("LoFi Playtime preset has no PARAMS root")
+
+    attributes: dict[str, str] = {}
+    for parameter in source.findall("PARAM"):
+        parameter_id = parameter.attrib.get("id", "").strip()
+        if parameter_id:
+            attributes[parameter_id] = parameter.attrib.get("value", "")
+
+    values = dict(defaults())
+    values["mode"] = 19.0  # Twin Tape
+    values["delayStyle"] = 0.0  # Playtime has one shared Basetime.
+    values["link"] = 1.0
+
+    time_ms_source = source_float(attributes, "timems", 1000.0)
+    time_ms = snap(time_ms_source, 0.1, 1.0, 2000.0)
+    values["timeL"] = time_ms
+    values["timeR"] = time_ms
+
+    source_division = min(19, max(0, int(round(
+        source_float(attributes, "timenotes", 13.0)))))
+    target_division = min(
+        len(DIVISION_NAMES) - 1,
+        source_division + PLAYTIME_DIVISION_OFFSET)
+    values["divisionL"] = float(target_division)
+    values["divisionR"] = float(target_division)
+    synchronised = source_float(attributes, "timemode", 0.0) >= 0.5
+    values["syncL"] = float(synchronised)
+    values["syncR"] = float(synchronised)
+
+    values["feedback"] = snap(source_float_alias(
+        attributes, ("feedbackamount", "feedback"), 0.0),
+        0.1, 0.0, 200.0)
+    source_spread = source_float_alias(
+        attributes, ("tapespread", "spread"), 75.0)
+    values["spread"] = snap(source_spread, 0.1, 0.0, 100.0)
+    values["mix"] = snap(
+        source_float(attributes, "mix", 100.0), 0.1, 0.0, 100.0)
+    frozen = source_float(attributes, "freeze", 0.0) >= 0.5
+    values["freeze"] = float(frozen)
+    values["freezeToggle"] = 1.0
+
+    heads: list[dict[str, float | bool | int]] = []
+    for head in (1, 2):
+        enabled = source_float(attributes, f"tape{head}", 1.0) >= 0.5
+        speed = min(2, max(0, int(round(
+            source_float(attributes, f"tape{head}speed", 1.0)))))
+        reverse = source_float(
+            attributes, f"tape{head}reverse", 0.0) >= 0.5
+        heads.append({
+            "enabled": enabled,
+            "speed": speed,
+            "reverse": reverse,
+            "speedCode": playtime_speed_code(float(speed), reverse),
+            "age": snap(source_float(
+                attributes, f"tape{head}age", 0.0), 0.1, 0.0, 100.0),
+            "shine": snap(source_float(
+                attributes, f"tape{head}shine", 100.0), 0.1, 0.0, 100.0),
+            "gain": snap(source_float(
+                attributes, f"tape{head}gain", 0.0), 0.1, -12.0, 12.0),
+        })
+
+    notes: list[str] = []
+    enabled_heads = [index for index, head in enumerate(heads)
+                     if bool(head["enabled"])]
+    if len(enabled_heads) == 1 and abs(values["spread"]) < 0.0001:
+        enabled_index = enabled_heads[0]
+        disabled_index = 1 - enabled_index
+        # Twin Tape has no per-head power switch.  At 0% Spread its two heads
+        # are averaged, so mirroring the active transport retains the intended
+        # pitch/reverse layer and nominal level without a wrong head leaking in.
+        heads[disabled_index] = dict(heads[enabled_index])
+        heads[disabled_index]["enabled"] = False
+        notes.append(
+            f"Tape {disabled_index + 1} was disabled; mirrored Tape "
+            f"{enabled_index + 1} at 0% Spread because Twin Tape has no "
+            "per-head power parameter.")
+    elif len(enabled_heads) < 2:
+        for disabled_index, head in enumerate(heads):
+            if not bool(head["enabled"]):
+                head["gain"] = -12.0
+        notes.append(
+            "One or both source tapes were disabled outside the exact 0% "
+            "Spread mirror case; disabled Afterglow heads use -12 dB because "
+            "Twin Tape has no per-head power parameter.")
+
+    for head_index, head in enumerate(heads, 1):
+        values[f"twinTapeSpeed{head_index}"] = float(head["speedCode"])
+        values[f"twinTapeAge{head_index}"] = float(head["age"])
+        values[f"twinTapeShine{head_index}"] = float(head["shine"])
+        values[f"twinTapeGain{head_index}"] = float(head["gain"])
+
+    timing_description = (DIVISION_NAMES[target_division]
+                          if synchronised
+                          else f"{format_value(time_ms)} ms")
+    notes[:0] = [
+        f"Mode: LoFi Playtime -> Twin Tape",
+        f"Basetime: {timing_description} on linked Left/Right heads",
+        f"Feedback: {format_value(values['feedback'])}%",
+        f"Spread: {format_value(values['spread'])}%",
+        f"Mix: {format_value(values['mix'])}%",
+    ]
+    for head_index, head in enumerate(heads, 1):
+        speed_name = PLAYTIME_SPEED_NAMES[int(head["speed"])]
+        direction = "Reverse" if bool(head["reverse"]) else "Forward"
+        notes.append(
+            f"Tape {head_index}: {direction} {speed_name}, "
+            f"Age {format_value(float(head['age']))}%, "
+            f"Shine {format_value(float(head['shine']))}%, "
+            f"Gain {format_value(float(head['gain']))} dB")
+    if abs(time_ms_source - time_ms) > 0.05:
+        notes.append(
+            f"Free-time Basetime {format_value(time_ms_source)} ms was "
+            f"clamped to Afterglow's {format_value(time_ms)} ms limit.")
+
+    return build_target(values), notes
+
+
 def convert_deelay(source: ET.Element) -> tuple[ET.Element, list[str]]:
     attributes = source.attrib
     values = dict(defaults())
@@ -1187,7 +1357,7 @@ def choose_preset_names(available_names: tuple[str, ...], args) -> tuple[str, ..
             if name.startswith("Richard Devine/")
             and name.lower().endswith(".vpreset"))
     return tuple(name for name in available_names
-                 if name.lower().endswith((".vpreset", ".sspreset", ".h2p")))
+                 if name.lower().endswith(SUPPORTED_PRESET_SUFFIXES))
 
 
 def safe_windows_component(name: str) -> str:
@@ -1226,6 +1396,9 @@ def convert_selected(names: tuple[str, ...], read_preset,
             preset_name = (source.attrib.get(
                 "presetName", PurePosixPath(name).stem).strip()
                 or PurePosixPath(name).stem)
+        elif name.lower().endswith(".lofiplaytimepreset"):
+            target, notes = convert_playtime(source)
+            preset_name = PurePosixPath(name).stem
         indent(target)
 
         source_path = PurePosixPath(name)
@@ -1278,7 +1451,7 @@ def main() -> None:
         preset_files = tuple(sorted(
             (path for path in source_presets.rglob("*")
              if path.is_file()
-             and path.suffix.lower() in (".vpreset", ".sspreset", ".h2p")),
+             and path.suffix.lower() in SUPPORTED_PRESET_SUFFIXES),
             key=lambda path: path.as_posix().lower()))
         available_names = tuple(
             path.relative_to(source_presets).as_posix()
@@ -1295,7 +1468,7 @@ def main() -> None:
         convert_selected(names, read_folder_preset,
                          args.output_directory, reports)
     elif (source_presets.is_file()
-          and source_presets.suffix.lower() in (".vpreset", ".sspreset", ".h2p")):
+          and source_presets.suffix.lower() in SUPPORTED_PRESET_SUFFIXES):
         names = (source_presets.name,)
 
         def read_single_preset(name: str) -> bytes:
@@ -1322,7 +1495,8 @@ def main() -> None:
         "====================================================",
         "",
         "Supported sources: ValhallaDelay .vpreset, Sixth Sample Deelay PE .sspreset,",
-        "u-he ColourCopy .h2p and u-he Uhbik Delay/Uhbik-D .h2p.",
+        "u-he ColourCopy .h2p, u-he Uhbik Delay/Uhbik-D .h2p and",
+        "Yum Audio LoFi Playtime .lofiplaytimepreset.",
         "",
         "ValhallaDelay direct mappings: Mix, audible timing, timing sync type, Mode,",
         "Feedback, Width/Spread, Drive/DIST amount, mode-aware Era-to-DIST family, Age,",
@@ -1353,6 +1527,14 @@ def main() -> None:
         "supply additional approximate movement. Uhbik's fifth tap, independent feedback-head",
         "topology, arbitrary modulation-matrix routes and separate Input/Wet gains have no",
         "direct Afterglow equivalents and are reported per preset.",
+        "",
+        "LoFi Playtime direct mappings: Twin Tape mode, shared Basetime, free or host-",
+        "synchronised timing, both tape speeds and directions, per-head Age, Shine and",
+        "Gain, Feedback, Spread, Mix and Freeze. Playtime's source note list predates",
+        "Afterglow's 1/128 addition, so its note indices move forward one slot to retain",
+        "the same timing. Twin Tape has no per-head power parameter; a disabled tape at",
+        "0% Spread is represented by mirroring the enabled transport, and any less exact",
+        "case is reported instead of silently claiming a direct conversion.",
         "",
         "Quad converts to Multi-Tap: Tap A-D enable states and four audible head times are",
         "materialised. Delay Spacing changes those times; Valhalla's inter-channel head offset",

@@ -41,6 +41,8 @@ if not exist "%~f1" (
     call :convert_one "%~f1"
 ) else if /i "%~x1"==".h2p" (
     call :convert_one "%~f1"
+) else if /i "%~x1"==".lofiplaytimepreset" (
+    call :convert_one "%~f1"
 ) else (
     echo SKIP: %~nx1 is not a supported preset, ZIP file or preset folder.
     set "FAILED=1"
@@ -83,7 +85,7 @@ exit /b 0
 :no_sources
 echo No source preset ZIP files or unzipped folders were found.
 echo.
-echo Put every Valhalla, Deelay PE, ColourCopy or Uhbik Delay preset ZIP or folder into:
+echo Put every Valhalla, Deelay PE, ColourCopy, Uhbik Delay or LoFi Playtime preset ZIP or folder into:
 echo   %SOURCE_DIR%
 echo.
 echo Then double-click this batch file again.
