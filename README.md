@@ -89,7 +89,7 @@ Places a selectable 2/4/6/8/10/12-stage stereo phaser inside the regenerating de
 
 ### Pitch Lush
 
-Combines a pitch-shifted delay voice with a second stereo-detuned voice at the same overall delay time. Shift sets the main transposition, Detune separates the channels in both voices, and P MIX blends continuously from the detuned voice at 0% to the shifted voice at 100%. The combined result enters feedback so shimmer-like pitch structures build across repeats.
+Combines a pitch-shifted delay voice with a second stereo-detuned voice at the same overall delay time. Shift sets the main transposition, Detune separates the channels in both voices, and P MIX blends continuously from the detuned voice at 0% to the shifted voice at 100%. Positive shifts also introduce a restrained, energy-normalised upper voice as P MIX rises, giving octave-up settings a brighter cascading shimmer without raising the loop's nominal level. The combined result enters feedback so pitch structures build across repeats.
 
 ### Chromatic
 
@@ -143,7 +143,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 - Duck from 0% to 100% reduces only the audible wet return while new input is present. The dry signal and internal feedback regeneration remain untouched, so repeats recover naturally instead of being erased from the delay loop.
 - Duck Attack ranges from 1 to 500 ms and Duck Release from 20 to 3000 ms. A stereo-linked peak envelope prevents the delayed image from shifting sideways while it ducks.
-- Diffusion Amount from 0% to 100% controls the coefficients, density and decay of a four-stage stereo allpass cascade; values below 1% bypass it, 68% gives a balanced fade-in/fade-out region and high settings can form a reverb-like tail without relying entirely on Feedback. Diffusion Size sets the network span from 2% to 100% of the displayed delay. In standard modes that span is removed from the straight-delay section, preserving the displayed echo time as the sound changes from a compact blur to a large cloud; Pitch Rev deliberately adds diffusion after its changing reverse splice. Paired slow internal movement scales with the span and has no net delay-time drift.
+- Diffusion Amount from 0% to 100% controls the coefficients, density and decay of a four-stage stereo allpass cascade; values below 1% bypass it, 68% gives a balanced fade-in/fade-out region and high settings can form a reverb-like tail without relying entirely on Feedback. Diffusion Size sets the network span from 2% to 100% of the displayed delay while the primary stereo or Multi-Tap read heads remain at their selected times, so increasing Size grows the cloud after each tap instead of pulling the tap earlier. Paired slow internal movement scales with the span and has no net delay-time drift.
 - Mod Amount from 0% to 100% controls delay-time movement. The available physical range begins at 2.5 ms for near-zero delays, increases with the selected delay time and reaches 35 ms at 250 ms. Digital and Crystal use rounded triangle motion; LoFi uses stereo-decorrelated random drift; Phaser uses the same 0-100% range for its notch sweep. Single uses matched stereo phase, Dual uses 90-degree quadrature, Ratio and Ping-Pong use 180-degree antiphase, and Quad staggers the four tap pairs. Mod Rate ranges from 0.02 to 10 Hz. Digital and Crystal move the otherwise-negative part of very short sweeps forwards from a 0.25 ms safety floor.
 
 ### Pitch and mode-specific controls
@@ -216,7 +216,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 - A target control's saved value is its modulation reference. Bipolar `DEPTH` scales the complete sequence shape: negative values shrink it, 0% leaves the drawn curve unchanged and positive values expand a smaller curve towards the available Unipolar or Bipolar limit. `OFFSET` moves the resulting shape up or down without changing it.
 - In Bipolar mode, the saved target value is the centre and modulation moves equally above and below it, limited by the nearer parameter boundary. In Unipolar mode, the saved target value is the starting point and positive steps move from it towards the parameter maximum.
-- Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Click a target's coloured dot to bypass it without removing it, click its cross to remove it, and use the mouse wheel when the target list contains more rows than can be shown at once.
+- Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Each row has its own 0-100% Depth knob: 0% leaves that destination at its saved value, 50% applies half of its available movement in normalised parameter space and 100% retains the full movement set by the master sequencer DEPTH. Drag the small knob vertically, hold Shift for fine movement, use the wheel over it, or double-click it to return to 100%. Click a target's coloured dot to bypass it without removing it and click its cross to remove it. When more rows are assigned than can be shown, native clickable chevrons indicate earlier or later rows and the wheel scrolls anywhere outside a Depth knob.
 - Stereo and Multi-Tap Time handles remain assignable under Tempo Sync. The same sequencer target follows the visible control, modulating milliseconds when Sync is off or musical-note divisions when Sync is on.
 - Attack, Release, DEPTH, OFFSET, START and END can also be assigned as targets. These sequencer controls use the preceding evaluated sequence value to avoid a circular modulation dependency.
 
@@ -225,7 +225,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - Host Sync, Waveform, User, Rate, Start, End, range link and Direction share one visual centreline in the upper sequencer panel. The Waveform and User selectors identify themselves directly when empty, while all selectors share the established Mode/Dist Type styling.
 - `HUE` and `SAT` set the sequence colour and readable target highlights. `LUM` adjusts the step display only, preventing assigned-target labels and the colour knobs from becoming too dark to read. All three default and double-click reset to 50%.
 - `ANIMATE` makes assigned controls visually follow their effective sequenced values without changing their stored values or writing host automation. Turning it off immediately returns every control display to its saved position while audible modulation continues.
-- Steps, targets, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. ANIMATE and whether the sequencer panel is open remain global interface preferences.
+- Steps, targets, every target's individual Depth, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. ANIMATE and whether the sequencer panel is open remain global interface preferences.
 - Turning the sequencer's `ON` switch off completely bypasses target modulation while retaining the pattern and target assignments.
 
 ## Current limitations

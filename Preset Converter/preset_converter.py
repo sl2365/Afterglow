@@ -244,6 +244,8 @@ def defaults() -> list[tuple[str, float]]:
             (f"seqTarget{slot}", 0.0),
             (f"seqTargetEnabled{slot}", 1.0),
         ))
+    for slot in range(1, 17):
+        values.append((f"seqTarget{slot}_depth", 1.0))
     return values
 
 
@@ -422,7 +424,7 @@ def format_value(value: float) -> str:
 
 
 def build_target(values: dict[str, float]) -> ET.Element:
-    root = ET.Element("AfterglowParameters", {"schemaVersion": "39"})
+    root = ET.Element("AfterglowParameters", {"schemaVersion": "40"})
     for parameter_id, _ in defaults():
         ET.SubElement(root, "PARAM", {
             "id": parameter_id,

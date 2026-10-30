@@ -1,5 +1,23 @@
 # Afterglow — Changelog
 
+## 1.78.0 — Per-Target Depth and Delay Clouds — 30 October 2026
+
+### Added
+
+- Added a saved, host-automatable 0-100% Depth knob to every assigned sequencer-target row. The existing bipolar Sequencer DEPTH remains the master shape control; each row knob independently scales only that destination in normalised parameter space.
+- Added vertical drag, Shift-fine drag, wheel adjustment and a 100% double-click reset to each compact target Depth knob. The enabled LED and remove cross retain their existing functions, and ANIMATE follows the final depth-scaled destination value.
+- Added a restrained energy-normalised upper voice to positive Pitch Lush transpositions. It strengthens octave-up shimmer as P MIX rises and participates in the normal feedback path without adding a new control or changing other modes.
+
+### Fixed
+
+- Kept Stereo and Multi-Tap read heads at their selected times while Diffusion Size changes. The allpass network now grows only the cloud after each tap instead of moving the immediate tap earlier to compensate for the network span.
+- Replaced the Targets list's font-dependent Unicode scroll triangles—which could appear as stray characters or ellipses—with native vector chevrons. Both indicators are now clickable while wheel scrolling remains available.
+
+### Saved state
+
+- Advanced saved-state schema to 40 and appended all 16 target Depth parameters after every established host parameter. Schema 32-39 states receive the exact former behaviour at 100% Depth, while new presets and projects restore every row independently.
+- Updated the external converter to emit complete schema-40 presets with neutral 100% target Depth values.
+
 ## 1.77.0 — Twin Tape Timing Cleanup — 30 October 2026
 
 ### Changed
