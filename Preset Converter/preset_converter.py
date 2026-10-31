@@ -232,6 +232,7 @@ def defaults() -> list[tuple[str, float]]:
         ("sequencerRate", 6.0), ("sequencerStart", 1.0),
         ("sequencerEnd", 32.0), ("sequencerRangeLink", 0.0),
         ("sequencerDirection", 0.0), ("sequencerBipolar", 0.0),
+        ("sequencerUnipolarNegative", 0.0),
         ("sequencerAttack", 0.0), ("sequencerRelease", 0.0),
         ("sequencerPeak", 0.0), ("sequencerMove", 0.0),
         ("sequencerHue", 0.5), ("sequencerSaturation", 0.5),
@@ -424,7 +425,7 @@ def format_value(value: float) -> str:
 
 
 def build_target(values: dict[str, float]) -> ET.Element:
-    root = ET.Element("AfterglowParameters", {"schemaVersion": "40"})
+    root = ET.Element("AfterglowParameters", {"schemaVersion": "41"})
     for parameter_id, _ in defaults():
         ET.SubElement(root, "PARAM", {
             "id": parameter_id,

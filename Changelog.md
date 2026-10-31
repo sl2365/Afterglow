@@ -1,5 +1,140 @@
 # Afterglow — Changelog
 
+## 1.83.1 — Transparent Mix Lock — 31 October 2026
+
+### Changed
+
+- Removed the square background and border from the MIX padlock button. Only the padlock icon is now drawn beside the main MIX label; it remains grey while unlocked and yellow while locked.
+
+### Preserved
+
+- Kept the button's click area, tooltip and preset Mix-lock behaviour unchanged.
+
+## 1.83.0 — Browser Mix and Preset Mix Lock — 31 October 2026
+
+### Added
+
+- Added a compact browser-only MIX knob in the header. Opening the preset browser swaps Theme for this smaller copy of the main Mix control; closing it restores Theme. The copy has no numerical value and cannot be assigned as a sequencer target.
+- Added a padlock beside the main MIX knob. Engaging it captures the current level, turns the lock yellow and restores that level after every preset load. Adjusting either visible Mix knob while locked updates the retained level.
+
+### Changed
+
+- Changed the `UNIPOLAR +` sequencer LED from lilac to Aqua so it is immediately distinct from the purple `UNIPOLAR -` state. Bipolar remains rose.
+
+### Preserved
+
+- The browser MIX control and main MIX control share the existing parameter; no duplicate audio parameter or preset field was added. Mix Lock remains independent of preset files, and the preset/state schema remains 41.
+
+## 1.82.4 — Atomic Polarity Selection — 31 October 2026
+
+### Fixed
+
+- Fixed the first polarity click being absorbed and every subsequent label being one state behind the sequencer display.
+- Replaced the competing label/grid parameter reads with one explicit three-state UI value. A click now advances the label, LED and step grid together, then stores a canonical parameter pair: `UNIPOLAR +` = off/off, `BIPOLAR` = on/off and `UNIPOLAR -` = off/on.
+- Prevented the two parameter-attachment callbacks from exposing the temporary state between those two writes. Preset loads and host automation still resynchronise the unified state from the saved parameters.
+
+### Preserved
+
+- Kept the established full-height `UNIPOLAR +`, dual-sided `BIPOLAR` and vertically inverted `UNIPOLAR -` displays, modulation behaviour, LED positions/colours, presets and schema 41 unchanged.
+
+## 1.82.3 — Polarity State Synchronisation — 31 October 2026
+
+### Fixed
+
+- Fixed the polarity label and LED remaining exactly one selection behind the live sequencer state. The grid changed immediately, but the two-parameter attachment callback could retain the preceding label, producing the visible `UNIPOLAR -`/positive, `UNIPOLAR +`/bipolar and `BIPOLAR`/negative mismatch.
+- The control now synchronises from the same live Bipolar and negative-direction parameters immediately after every click and during the editor refresh timer. A cached state prevents unnecessary text, colour and repaint work when nothing changes.
+
+### Preserved
+
+- Left all three v1.82.2 display shapes, LED colours, fixed LED position, modulation maths, saved-state schema 41 and Grain target Depth colour unchanged.
+
+## 1.82.2 — Restored Unipolar Display — 31 October 2026
+
+### Fixed
+
+- Restored `UNIPOLAR +` to its established full-height positive step display and matching full-height mouse editing. `BIPOLAR` continues to show both positive and negative halves, while `UNIPOLAR -` now presents the original unipolar display flipped vertically from top to bottom.
+- Fixed the polarity LED position. Its centre is now pinned independently of the changing `UNIPOLAR +`, `BIPOLAR` and `UNIPOLAR -` label widths.
+- Set the polarity LED colours to lilac for `UNIPOLAR +`, rose for `BIPOLAR` and a readable medium purple for `UNIPOLAR -`.
+- Corrected sequencer target Depth knobs in Grain mode to use Grain's standard purple mode colour instead of being clamped to Twin Tape's colour.
+
+### Preserved
+
+- Left the three modulation directions, saved patterns, waveform generation, schema 41, target Depth processing and Recycle Bin/Trash folder deletion unchanged.
+
+## 1.82.1 — Polarity Display and Recyclable Folder Deletion — 31 October 2026
+
+### Fixed
+
+- Aligned the step display with all three sequencer polarity states. `UNIPOLAR +` now occupies the upper half above the zero line, `BIPOLAR` retains the complete positive/negative display, and `UNIPOLAR -` mirrors the same unipolar pattern into the lower half. Mouse drawing and the Attack/Release envelope follow the displayed half in both unipolar modes.
+
+### Changed
+
+- Changed preset-folder deletion from permanent recursive removal to the operating system's native Recycle Bin or Trash operation. Confirmation and failure messages now describe that recoverable destination.
+
+### Preserved
+
+- Left schema 41, saved step values, waveform generation, sequence files, target modulation maths and existing presets unchanged. Switching between the two unipolar directions changes only the visual direction and modulation destination.
+
+## 1.82.0 — Three-Way Sequencer Polarity — 31 October 2026
+
+### Added
+
+- Changed the sequencer polarity control into a three-state selector: green `UNIPOLAR +`, amber `BIPOLAR` and rose `UNIPOLAR -`. Positive unipolar movement retains the saved target value as its floor; the new negative direction retains it as the ceiling and moves down towards the parameter minimum using the same pattern, master DEPTH and per-target Depth.
+- Appended a saved, host-automatable `Sequencer Unipolar Negative` flag and advanced preset schema to 41. The converter emits the new neutral flag in schema-41 presets.
+
+### Preserved
+
+- Kept the released `sequencerBipolar` Boolean parameter and its automation meaning unchanged. Schema 32-40 presets receive positive unipolar as the neutral default, while existing Bipolar presets and host automation remain Bipolar.
+- Left the step editor, waveform generation, context-menu commands and unipolar step storage unchanged; both unipolar directions use the same visible 0-100% step range and differ only in target direction.
+
+## 1.81.0 — Preset Folder Tools and Fuzz — 31 October 2026
+
+### Added
+
+- Added `Paste preset here` when right-clicking unused preset-list space, including completely empty real folders. The existing virtual Favourites view still refuses physical paste operations.
+- Added `New folder...` and `Delete folder...` to the folder-tree menu. New creates a child of a real folder, or a top-level folder when invoked from Favourites. Delete is unavailable for the virtual folder and requires confirmation; non-empty deletion explicitly warns that all contained presets and subfolders will be permanently removed.
+- Added `Fuzz` as the seventeenth Distortion Type: high-gain asymmetric rails create dense even/odd harmonics and compressed sustain, followed by a restrained fixed tone stage, DC removal and static output compensation.
+
+### Preserved
+
+- Appended Fuzz after all sixteen established Dist Type indices, preserving every existing preset and automation value. Preset schema 40, delay algorithms, mode indices and host parameter IDs remain unchanged.
+- Folder deletion clears affected favourite references, copied-file state and the active preset path only after deletion succeeds. Copy/Paste collision protection and all v1.80.0 star behaviour remain unchanged.
+
+## 1.80.0 — Preset Favourites — 31 October 2026
+
+### Added
+
+- Added a permanent virtual `Favourites` folder at the top of the preset-folder panel. Every preset row now has a native vector star: grey when unstarred and yellow when favourited.
+- Stored favourite references as portable preset-root-relative paths in `Root\Afterglow\Settings\Favourites.ini`. Favouriting never copies, moves, edits or deletes the underlying preset; unstarring removes only its virtual-folder reference.
+- Added themed right-click menus for `Copy preset` and `Paste preset here`. A copied preset can be pasted into the current real list folder or directly onto a real folder in the tree. Filename collisions produce independent `Copy`, `Copy 2` and subsequent files without overwriting anything.
+- Made header previous/next navigation and the quick preset popup follow the Favourites collection while its virtual folder is selected.
+
+### Preserved
+
+- Left preset contents, preset schema 40, audio processing, mode indices and host parameters unchanged. The virtual Favourites folder cannot receive pasted files, keeping stars and physical file management independent.
+
+## 1.79.0 — Grain — 31 October 2026
+
+### Added
+
+- Added `Grain` as a dedicated forward-granular delay mode. Four Hann-overlapped grains per channel maintain constant overlap energy, retain a clearly granular stream at zero transposition and remain bounded behind the delay write head.
+- Reused the established Shift and Detune controls for -24 to +24-semitone grain transposition and stereo separation. Age shortens the windows, increases stereo scatter and reduces floating-converter resolution; Mod Amount and Mod Rate control the range and speed of the moving scatter.
+- Added the Grain algorithm to Stereo and Multi-Tap timing, the normal Feedback loop, mode-coloured interface, contextual help and sequencer-accessible shared parameters.
+
+### Preserved
+
+- Appended Grain after all twenty released modes, leaving every existing mode index, parameter ID, preset meaning and saved-state schema 40 unchanged.
+
+## 1.78.1 — Mode-Coloured Target Depth — 30 October 2026
+
+### Changed
+
+- Changed every compact sequencer-target Depth knob outline and value arc from the fixed control yellow to the currently selected Delay mode colour. Disabled rows retain their established reduced opacity.
+
+### Preserved
+
+- Left the target Depth values, automation, modulation maths, target enable state, saved-state schema 40 and every delay algorithm unchanged.
+
 ## 1.78.0 — Per-Target Depth and Delay Clouds — 30 October 2026
 
 ### Added
