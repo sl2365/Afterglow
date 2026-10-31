@@ -19,6 +19,8 @@ Credits: Many thanks to Artvera for the logo.
 
 ![Afterglow](Resources/Afterglow3.jpg)
 
+![Afterglow](Resources/Afterglow4.jpg)
+
 ## Build and installation
 
 Project root: `_Projects\Afterglow`, beside the shared `_Projects\_Tools` folder.
@@ -223,8 +225,8 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 ### Modulation range and targets
 
-- A target control's saved value is its modulation reference. Bipolar `DEPTH` scales the complete sequence shape: negative values shrink it, 0% leaves the drawn curve unchanged and positive values expand a smaller curve towards the available Unipolar or Bipolar limit. `OFFSET` moves the resulting shape up or down without changing it.
-- The polarity LED cycles through three clearly labelled states. `UNIPOLAR +` uses the original full-height positive step display and moves from the saved target value towards the parameter maximum. `BIPOLAR` displays both positive and negative steps around its centre line and moves equally above and below the saved value, limited by the nearer boundary. `UNIPOLAR -` uses the same full-height unipolar pattern upside down and moves from the saved value towards the parameter minimum. The fixed-position LED is lilac, rose or medium purple respectively.
+- A target control's saved value is its modulation reference. Bipolar `DEPTH` scales the complete sequence shape: negative values shrink it, 0% leaves the drawn curve unchanged and positive values expand a smaller curve towards the available Unipolar or Bipolar limit. `OFFSET` moves the resulting shape up or down without changing it. Both vertical faders draw a coloured stalk from their zero centre point to the current tab, clearly showing direction and travel while retaining the complete neutral guide rail.
+- The polarity LED cycles through three clearly labelled states. `UNIPOLAR +` uses the original full-height positive step display and moves from the saved target value towards the parameter maximum. `BIPOLAR` displays both positive and negative steps around its centre line and moves equally above and below the saved value, limited by the nearer boundary. `UNIPOLAR -` uses the same full-height unipolar pattern upside down and moves from the saved value towards the parameter minimum. The fixed-position LED is Aqua, rose or medium purple respectively.
 - Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Each row has its own 0-100% Depth knob whose arc follows the currently selected Delay mode colour: 0% leaves that destination at its saved value, 50% applies half of its available movement in normalised parameter space and 100% retains the full movement set by the master sequencer DEPTH. Drag the small knob vertically, hold Shift for fine movement, use the wheel over it, or double-click it to return to 100%. Click a target's coloured dot to bypass it without removing it and click its cross to remove it. When more rows are assigned than can be shown, native clickable chevrons indicate earlier or later rows and the wheel scrolls anywhere outside a Depth knob.
 - Stereo and Multi-Tap Time handles remain assignable under Tempo Sync. The same sequencer target follows the visible control, modulating milliseconds when Sync is off or musical-note divisions when Sync is on.
 - Attack, Release, DEPTH, OFFSET, START and END can also be assigned as targets. These sequencer controls use the preceding evaluated sequence value to avoid a circular modulation dependency.

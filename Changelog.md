@@ -1,5 +1,15 @@
 # Afterglow — Changelog
 
+## 1.83.2 — Depth and Offset Fader Stalks — 31 October 2026
+
+### Changed
+
+- Added coloured stalks from the zero centre point to the current DEPTH and OFFSET fader tabs. The complete neutral guide remains visible, while the new stalks show direction and distance from centre at a glance.
+
+### Preserved
+
+- Discarded the superseded v1.83.2 play-position overlay. The established current-step display, sequencer clock, modulation behaviour and audio processing remain exactly as they were in v1.83.1.
+
 ## 1.83.1 — Transparent Mix Lock — 31 October 2026
 
 ### Changed
