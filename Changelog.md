@@ -1,5 +1,46 @@
 # Afterglow — Changelog
 
+## 1.83.7 — Global Preset Cursor Keys — 1 November 2026
+
+### Changed
+
+- Made the Left and Right cursor keys perform the same complete-list Previous/Next preset actions whenever the plugin editor is open, regardless of whether the preset browser is visible or which plugin control currently has keyboard focus.
+- Kept Up and Down cursor behaviour unchanged inside the preset browser.
+
+### Preserved
+
+- Preset ordering, favourites, browser selection, Mix Lock, saved state, sequencer behaviour and audio processing remain unchanged.
+
+## 1.83.6 — Preset Cursor Cycling — 1 November 2026
+
+### Changed
+
+- Changed Left/Right cursor keys in the open preset list to perform the same complete-list Previous/Next actions as the two preset arrows beside the header preset name. Navigation now cycles through every preset instead of being limited to the two cells in the currently selected browser row.
+- Kept Up/Down cursor behaviour unchanged for selecting preset-browser rows. Pressing Enter still loads the highlighted browser cell.
+
+### Preserved
+
+- Preset ordering, favourites, folder selection, Mix Lock, saved state, sequencer behaviour and audio processing remain unchanged.
+
+## 1.83.5 — Browser and Sequencer Control Fixes — 1 November 2026
+
+### Added
+
+- Added Left/Right cursor-key navigation between the two preset-browser columns. Up/Down continues to move between rows, retains the selected column and safely returns to the left column when the final row has no right-hand preset.
+- Explicitly enabled mouse-wheel adjustment for the sequencer DEPTH and OFFSET faders.
+
+### Fixed
+
+- Kept sequencer tooltip headings tied to their owning controls. Hovering the visible RATE, START or END value now continues to show `RATE`, `START` or `END` instead of replacing the heading with `1/16`, `1` or `32`.
+
+### Source presentation
+
+- Verified that the runtime plugin source and interface contain no third-party product or company names. The separate preset converter remains excluded because its source-format identifiers are required to recognise the files it converts.
+
+### Preserved
+
+- Preset files, saved state, browser loading behaviour, sequencer modulation and audio processing remain unchanged.
+
 ## 1.83.4 — CPU Efficiency — 1 November 2026
 
 ### Improved
