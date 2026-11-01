@@ -1,5 +1,29 @@
 # Afterglow — Changelog
 
+## 1.83.4 — CPU Efficiency — 1 November 2026
+
+### Improved
+
+- Stopped the editor repainting every delay and sequencer control 30 times per second when its animated display value has not changed. Controls still update at the established rate whenever ANIMATE is visibly moving them.
+- Bypassed the complete distortion dispatcher when DIST has settled at zero. Stateful distortion algorithms no longer run filters, noise generators or nonlinear functions while their contribution is inaudible.
+- Reused the floating-converter resolution while AGE is stationary and skipped converter and Grain setup calculations outside the modes that use them. Parameter smoothing retains the original sample-accurate calculation whenever AGE is moving.
+- Enabled JUCE's Release-only link-time optimisation flags for the Windows VST3 build.
+
+### Preserved
+
+- Kept the active delay, feedback, distortion, modulation, Grain and sequencer equations unchanged. These optimisations remove inactive or repeated work without changing existing presets or the saved-state schema.
+
+## 1.83.3 — Stable Animated Controls — 31 October 2026
+
+### Fixed
+
+- Removed the brief original-value flicker from sequencer-target knobs while ANIMATE is enabled. Animated display values are no longer cleared at the start of every audio block, eliminating the race in which the GUI could repaint between clearing and recalculation.
+- The most recent animated value now remains authoritative while the sequencer and that target are active. Removing, bypassing or disabling the target—or turning the sequencer off—immediately returns the control to its stored value.
+
+### Preserved
+
+- ANIMATE remains display-only: stored parameter values, host automation and audible sequencer modulation are unchanged.
+
 ## 1.83.2 — Depth and Offset Fader Stalks — 31 October 2026
 
 ### Changed

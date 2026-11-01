@@ -235,7 +235,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 - Host Sync, Waveform, User, Rate, Start, End, range link and Direction share one visual centreline in the upper sequencer panel. The Waveform and User selectors identify themselves directly when empty, while all selectors share the established Mode/Dist Type styling.
 - `HUE` and `SAT` set the sequence colour and readable target highlights. `LUM` adjusts the step display only, preventing assigned-target labels and the colour knobs from becoming too dark to read. All three default and double-click reset to 50%.
-- `ANIMATE` makes assigned controls visually follow their effective sequenced values without changing their stored values or writing host automation. Turning it off immediately returns every control display to its saved position while audible modulation continues.
+- `ANIMATE` makes assigned controls visually follow their effective sequenced values without changing their stored values or writing host automation. The latest calculated display position is retained continuously between audio blocks, preventing the stored knob position from flashing through. Turning ANIMATE off immediately returns every control display to its saved position while audible modulation continues.
 - Steps, targets, every target's individual Depth, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. ANIMATE and whether the sequencer panel is open remain global interface preferences.
 - Turning the sequencer's `ON` switch off completely bypasses target modulation while retaining the pattern and target assignments.
 
