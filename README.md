@@ -174,6 +174,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 - The fixed two-line contextual information area occupies the lower-left 683 design pixels inside the coloured surround. The lower-right area beneath the last two panels remains clear for future buttons, and the eight-pixel bottom margin matches the side margins.
 - Hover help identifies the actual control in its first line instead of using a generic Afterglow or Sequencer heading. The Preset Browser button is included.
+- The main `!!!` button randomises only the delay controls, including Mode, Dist Type and Echo Offset. It never changes sequence steps, Gate states, target assignments, sequencer controls, power or Freeze; the sequencer's own menus provide independent step and Gate randomisation.
 - Echo Offset is active only in the Chaotic and reverse-family modes that use it; its label, guide and handle visibly dim elsewhere.
 - Rotary value fields retain their normal appearance, while clicking one opens an 18-pixel-high editor that displays the complete typed value without clipping its lower edge.
 - Top-right Power indicator uses a clearer green illumination while processing is active and remains unlit while bypassed. Host bypass automation remains conventional, uses a smoothed dry/processed transition and leaves the delay engine running.
@@ -200,7 +201,7 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 ### Scaling and preset browser
 
-- Dragging the bottom-right corner scales the complete interface from 75% to 200% at a fixed aspect ratio.
+- Dragging the bottom-right corner scales the complete interface from 75% to 200% at a fixed aspect ratio. While resizing, the contextual-help area shows the current percentage and exact pixel dimensions.
 - The last scale and Theme setting are stored globally in `Root\Afterglow\Settings\Settings.ini`, outside audio presets and host project state.
 - The list-icon button hides the inner control panels and contextual-help strip, then opens the browser inside the coloured surround without changing the GUI height. The left 30% presents the folders beneath `Root\Afterglow\Presets` without showing the parent `Presets` folder itself. The preset area uses two name columns beside a vertical column of three matching 26x26 action buttons.
 - A permanent virtual `Favourites` folder appears first in the folder panel. Every listed preset has a grey star; clicking it turns yellow and adds that original file to Favourites. Unstarring removes only the reference and never deletes, moves or duplicates the preset. Favourite paths are stored portably in `Root\Afterglow\Settings\Favourites.ini`.
@@ -213,14 +214,17 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 
 ### Opening, clock and playback
 
-- The `SEQ` button at the lower-right opens or closes a second panel beneath the delay interface. Closing it restores the original GUI height; it does not stop or reset the sequence.
-- The sequencer provides 32 editable steps, draggable Start and End range targets, linked range movement, Left/Right nudge buttons, Loop, Bounce, Reverse, Played and Random directions, and rates from 1/128 to 1/1 including the available triplets.
+- The `SEQ` button at the lower-right opens or closes a second panel beneath the delay interface. Closing it restores the original GUI height; it does not stop or reset the sequence. Turning the sequencer `ON` LED off greys and disables every other sequencer control while preserving its complete pattern and settings; the ON control remains available to restore it.
+- The sequencer provides 32 editable steps, draggable Start and End range targets, linked range movement, independent step-value and Gate Left/Right nudge buttons, Loop, Bounce, Reverse, Played and Random directions, and rates from 1/128 to 1/1 including the available triplets.
 - Host Sync follows the DAW timeline. Played direction instead restarts from the first selected step when a new MIDI phrase begins, so Afterglow accepts MIDI input for that trigger mode.
 
 ### Drawing and pattern tools
 
 - Click or drag vertically in the main grid to draw step values. Right-click the grid for `Zero`, `Max`, `Min`, `Random`, `Reset`, `Save Sequence...`, `Copy` and `Paste` commands.
-- Attack and Release shape movement into and out of each value; the bright line over the steps shows the resulting transition envelope.
+- Each step has a Gate button beneath it. Clicking cycles `OFF`, `SHORT`, `LONG` and `REST`: Off closes the selected Gate path for the complete step, Short and Long keep it open for the duration selected by their knobs, and Rest provides continuous 100% throughput. The Short range is 10-60% and the Long range is 65-95%.
+- The LED/label beside Long cycles the complete Gate row between `INPUT`, `WET`, `FEEDBACK` and `OFF`. Input stops new sound entering while established repeats continue; Wet rhythmically chops the audible delay tail without disturbing its internal regeneration; Feedback interrupts regeneration while allowing the current echo through. Off bypasses Gate processing without changing the Gate steps or their Short/Long settings. Each active route uses the same fast anti-click smoothing.
+- Right-click the Gate row to set every Gate to `Short`, `Long`, `Rest` or `Off`, randomise all Gate states, restore the saved Gate pattern, or copy and paste the complete Gate pattern between presets. The dedicated Gate arrows rotate only the Gate states and wrap the first and final values; the original Nudge arrows now rotate only the main step values.
+- Attack and Release shape movement into and out of each value; the bright line over the steps shows the resulting transition envelope. Their readouts are always shown as percentages, including immediately after loading a preset, and use wider fields so the text remains naturally proportioned.
 - The Waveform menu writes one of 14 ready-made shapes into the grid. Saved `.agseq` patterns are stored in `Root\Afterglow\Sequences` and can be recalled from the User menu.
 
 ### Modulation range and targets
@@ -228,15 +232,16 @@ Pairs a clear forward audible repeat with a separate reverse-grain regeneration 
 - A target control's saved value is its modulation reference. Bipolar `DEPTH` scales the complete sequence shape: negative values shrink it, 0% leaves the drawn curve unchanged and positive values expand a smaller curve towards the available Unipolar or Bipolar limit. `OFFSET` moves the resulting shape up or down without changing it. Both vertical faders draw a coloured stalk from their zero centre point to the current tab, clearly showing direction and travel while retaining the complete neutral guide rail.
 - The polarity LED cycles through three clearly labelled states. `UNIPOLAR +` uses the original full-height positive step display and moves from the saved target value towards the parameter maximum. `BIPOLAR` displays both positive and negative steps around its centre line and moves equally above and below the saved value, limited by the nearer boundary. `UNIPOLAR -` uses the same full-height unipolar pattern upside down and moves from the saved value towards the parameter minimum. The fixed-position LED is Aqua, rose or medium purple respectively.
 - Drag a knob's dotted label or small dotted handle into `TARGETS`. Up to 16 controls can be assigned. Each row has its own 0-100% Depth knob whose arc follows the currently selected Delay mode colour: 0% leaves that destination at its saved value, 50% applies half of its available movement in normalised parameter space and 100% retains the full movement set by the master sequencer DEPTH. Drag the small knob vertically, hold Shift for fine movement, use the wheel over it, or double-click it to return to 100%. Click a target's coloured dot to bypass it without removing it and click its cross to remove it. When more rows are assigned than can be shown, native clickable chevrons indicate earlier or later rows and the wheel scrolls anywhere outside a Depth knob.
+- The bold borderless `!!!` control sits against the upper-left of TARGETS with matching top and left visual insets. It independently randomises all target assignments, their enabled states and their individual Depths without altering the step pattern, Gate pattern or any delay control.
 - Stereo and Multi-Tap Time handles remain assignable under Tempo Sync. The same sequencer target follows the visible control, modulating milliseconds when Sync is off or musical-note divisions when Sync is on.
-- Attack, Release, DEPTH, OFFSET, START and END can also be assigned as targets. These sequencer controls use the preceding evaluated sequence value to avoid a circular modulation dependency.
+- Attack, Release, DEPTH, OFFSET, START, END, SHORT and LONG can also be assigned as targets. These sequencer controls use the preceding evaluated sequence value to avoid a circular modulation dependency.
 
 ### Display, colour and saved state
 
-- Host Sync, Waveform, User, Rate, Start, End, range link and Direction share one visual centreline in the upper sequencer panel. The Waveform and User selectors identify themselves directly when empty, while all selectors share the established Mode/Dist Type styling.
+- Host Sync and Animate sit above the Waveform and User selectors at the left of the upper sequencer panel. The complete upper control group is aligned five pixels farther left, giving Waveform equal left and bottom inset within the panel. Rate, Start, End, the compact range link and Direction continue alongside them, while Short, Long and the Gate-route selector occupy the space before HUE, SAT and LUM. The closed Waveform, User and Direction selectors use compact boxes and text without reducing their popup-menu fonts.
 - `HUE` and `SAT` set the sequence colour and readable target highlights. `LUM` adjusts the step display only, preventing assigned-target labels and the colour knobs from becoming too dark to read. All three default and double-click reset to 50%.
 - `ANIMATE` makes assigned controls visually follow their effective sequenced values without changing their stored values or writing host automation. The latest calculated display position is retained continuously between audio blocks, preventing the stored knob position from flashing through. Turning ANIMATE off immediately returns every control display to its saved position while audible modulation continues.
-- Steps, targets, every target's individual Depth, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. ANIMATE and whether the sequencer panel is open remain global interface preferences.
+- Steps, Gate states, Short and Long Gate lengths, targets, every target's individual Depth, sequencer controls and HUE/SAT/LUM are stored with the plugin or preset state. Saved `.agseq` files also retain their Gate pattern and lengths. ANIMATE and whether the sequencer panel is open remain global interface preferences.
 - Turning the sequencer's `ON` switch off completely bypasses target modulation while retaining the pattern and target assignments.
 
 ## Current limitations

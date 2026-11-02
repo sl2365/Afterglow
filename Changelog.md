@@ -1,5 +1,158 @@
 # Afterglow — Changelog
 
+## 1.88.0 — Gate Bypass and Clean Build — 2 November 2026
+
+### Added
+
+- Added `OFF` as the fourth Gate Mode state after Input, Wet and Feedback. Off bypasses all Gate routing while preserving the complete Gate pattern, Short/Long lengths and selected sequencer settings.
+- The Gate Mode LED is visibly unlit in Off, while the fixed LED position and existing amber, aqua and rose route colours remain unchanged.
+- Turning Sequencer On off now greys and disables every other sequencer control, including the grid and Targets, while preserving all values. The On LED remains active so the complete sequencer can be restored immediately.
+
+### Fixed
+
+- Explicitly rounded the draggable `::` marker's floating-point drawing bounds to integer screen pixels. This removes the four MSVC C4244 build warnings without changing audio, parameters, presets or DSP precision.
+
+## 1.87.1 — Target Randomiser Alignment — 2 November 2026
+
+### Changed
+
+- Moved only the borderless Targets `!!!` control five pixels left so its visible left inset matches its top inset.
+- The Targets heading, target rows, scrolling controls and randomisation behaviour remain unchanged.
+
+## 1.87.0 — Independent Target Randomisation — 2 November 2026
+
+### Added
+
+- Added a bold borderless `!!!` control inside the upper-left of the Targets panel.
+- Clicking it independently randomises all 16 target assignments, their enabled states and every target's individual Depth, reproducing the target portion deliberately removed from the main delay Random button.
+- Added dedicated hover help and a result message for the new Targets randomiser.
+
+### Preserved
+
+- Target randomisation does not alter the main step values, Gate pattern, sequencer controls or delay parameters. The main `!!!` button remains delay-only.
+
+## 1.86.2 — Delay-Only Randomisation — 2 November 2026
+
+### Fixed
+
+- Stopped the main `!!!` Random button from changing the 32 sequencer steps or any target assignment, enabled state or per-target Depth.
+- Corrected its tooltip and result message to state that only delay controls, Mode, Dist Type and Echo Offset are randomised. Sequencer steps and Gates retain their own independent Random commands.
+
+## 1.86.1 — Complete Gate Menu — 2 November 2026
+
+### Changed
+
+- Added `Rest` and `Off` to the Gate-row context menu. Each command sets all 32 Gate steps to the selected state, matching the existing all-Short and all-Long commands.
+- Random, Reset, Copy and Paste retain their established behaviour and menu order after the four direct Gate-state commands.
+
+## 1.86.0 — Three-Way Sequencer Gate Routing — 2 November 2026
+
+### Added
+
+- Added a saved, host-automatable Gate Mode selector beside Long. Its fixed LED and changing label cycle through `INPUT`, `WET` and `FEEDBACK`, using amber, aqua and rose state colours respectively.
+- Input retains the established behaviour of stopping new audio while existing echoes continue. Wet rhythmically controls only the audible delayed output, while Feedback interrupts loop regeneration without suppressing the current echo.
+
+### Changed
+
+- Shifted every control and painted heading in the upper sequencer panel five pixels left. Waveform now has an exact 13-pixel inset from both the panel's left and bottom edges.
+- Corrected Attack and Release so live, restored and host-visible values always use percentages rather than raw 0.000-1.000 decimals.
+- Widened only the Attack and Release value fields while retaining their knob centres and visual rotary size, preventing longer percentage text from being compressed.
+- Advanced preset schema to 43. Existing states receive Input Gate mode, preserving their established Gate sound.
+
+### Preserved
+
+- Gate patterns, Short/Long lengths, anti-click smoothing, sequencer timing, target modulation, delay modes and existing preset sound remain unchanged unless the new Gate Mode is deliberately changed.
+
+## 1.85.4 — Compact Sequencer Header — 2 November 2026
+
+### Changed
+
+- Reduced the Start/End link button and its chain icon to 75% of their previous size while retaining the same centre point.
+- Reduced the closed Waveform, User and Direction selectors to approximately 85%, including only their closed-box text. Popup-menu dimensions and fonts remain unchanged.
+- Moved Short and Long left so the Direction-to-Short spacing matches the End-to-Direction spacing while preserving the Short-to-Long gap.
+
+### Preserved
+
+- Selector contents, popup behaviour, range linking, sequencer modulation, Gate processing, presets and delay audio remain unchanged.
+
+## 1.85.3 — Sequencer Nudge and Resize Display — 2 November 2026
+
+### Changed
+
+- Reduced both pairs of sequencer nudge buttons and their arrow icons to approximately 75% of their previous size.
+- Aligned the Steps heading and arrows with Attack, and the Gate heading and arrows with Release.
+- Moved the DEPTH and OFFSET labels and faders four pixels right without changing their vertical positions or behaviour.
+- Changed the `UNIPOLAR +` LED to the same aqua colour used by Animate.
+
+### Added
+
+- Added live GUI-size information to the contextual-help area while resizing, showing the current scale percentage and exact pixel dimensions.
+
+### Preserved
+
+- Sequencer modulation, Gate processing, presets, parameter positions outside the requested controls and all delay audio remain unchanged.
+
+## 1.85.2 — Sequencer Label Help Fix — 2 November 2026
+
+### Fixed
+
+- Made the START, END, ATTACK, RELEASE, DEPTH, OFFSET, SHORT and LONG draggable labels show exactly the same contextual help as their corresponding controls.
+- Moved the label-tooltip binding after label configuration so the shared control help is no longer overwritten by the generic drag instruction.
+
+### Preserved
+
+- Label dragging, target assignment, sequencer layout, Gate behaviour, presets and audio processing remain unchanged.
+
+## 1.85.1 — Sequencer Layout Tuning — 2 November 2026
+
+### Changed
+
+- Centred Host Sync over Waveform and Animate over User, added separation between the two selectors, and shifted Rate, Start, End, Direction, Short and Long together while leaving HUE, SAT and LUM fixed.
+- Raised the Start/End link and Direction selector to the visual centre of the upper panel while retaining the shared label line.
+- Moved Sequencer On and Polarity upward, then moved and separated Attack and Release so their complete draggable `::` markers remain visible.
+- Renamed the main pattern-nudge heading from `NUDGE` to `STEPS`.
+- Shortened the step-grid help to a single concise instruction and made the DEPTH/OFFSET draggable labels use the same contextual help as their controls.
+
+### Preserved
+
+- Gate behaviour, target modulation, nudge operations, preset state and all delay processing remain unchanged.
+
+## 1.85.0 — Gate Editing and Sequencer Layout — 2 November 2026
+
+### Added
+
+- Added a Gate-row context menu with `Short`, `Long`, `Random`, `Reset`, `Copy` and `Paste`. Gate Copy/Paste uses its own complete 32-step clipboard so patterns can be transferred between presets without affecting copied modulation steps.
+- Added a dedicated pair of Gate nudge arrows. They rotate only the 32 Gate states and wrap cleanly at both ends; the existing Nudge arrows now move only the main step values.
+- Made the Short and Long Gate-length controls draggable sequencer targets. Their individual target Depth controls and optional animated displays use the same modulation system as other assignable controls.
+
+### Changed
+
+- Reorganised the upper sequencer panel into two compact rows at the left: Host Sync and Animate now sit above Waveform and User, followed by Rate, Start, End and Direction. HUE, SAT and LUM remain in place.
+- Moved Short and Long into the recovered upper-panel space and enlarged them to match Rate, Start and End.
+- Reduced the Attack and Release rotary bodies to match HUE, SAT and LUM, and moved the original step Nudge controls slightly right.
+
+### Preserved
+
+- Gate still affects only new audio entering the delay, so existing repeats and feedback continue naturally. Gate timing ranges, existing presets, saved sequences, delay processing and the overall expanded GUI size remain unchanged.
+
+## 1.84.0 — Sequencer Input Gate — 2 November 2026
+
+### Added
+
+- Added one four-state Gate button beneath every sequencer step. Successive clicks cycle `Off`, `Short`, `Long` and `Rest`: Off blocks new delay input, Short and Long admit the selected portion of the step, and Rest keeps the input continuously open.
+- Added compact `SHORT` and `LONG` knobs. Short ranges from 10-60% of a step and Long from 65-95%; both are stored with presets and saved user sequences.
+- Applied a fast anti-click transition to the sequenced input gate. Gate closure stops only new audio entering the delay, allowing existing repeats and feedback to continue naturally.
+
+### Changed
+
+- Reduced the Rate, Start and End rotary bodies to the same visual size as the HUE, SAT and LUM controls, while retaining their values and single-row alignment.
+- Reduced the upper sequencer panel slightly, expanded the step area and moved the Nudge controls left to accommodate Gate without increasing the overall interface height.
+- Made Nudge move the Gate states together with their corresponding step values.
+
+### Preserved
+
+- Existing presets migrate with every Gate step set to Rest, producing the same continuous input path as before. Delay modes, target modulation, feedback, sequencer timing and preset ordering remain unchanged.
+
 ## 1.83.7 — Global Preset Cursor Keys — 1 November 2026
 
 ### Changed
