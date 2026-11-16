@@ -1,5 +1,21 @@
 # Afterglow — Changelog
 
+## 1.89.0 — Logo Zoom Menu and Complete LED Glow — 16 November 2026
+
+### Added
+
+- Made the complete Afterglow logo a GUI Zoom control. Clicking it opens a conventional popup menu offering 75%, 100%, 125%, 150%, 175%, 200%, 225%, 250%, 275% and 300%, with the current fixed choice marked.
+- Increased the maximum free-resize and saved GUI scale from 200% to 300%. The selected size continues to be stored portably in `Settings.ini` and is preserved when opening or closing the sequencer.
+
+### Fixed
+
+- Added explicit drawing room around every compact status LED, the numbered Multi-Tap LEDs and the global Power LED while preserving their established core sizes and centre positions. Their full glow now remains inside each component instead of being clipped at its edge.
+- Shifted the Sequencer ON, polarity and Gate Mode LED centres one pixel right so their complete glow has matching left and right clearance without moving their labels.
+
+### Preserved
+
+- Kept all audio processing, parameters, presets, sequencer values, Gate behaviour and state schema unchanged.
+
 ## 1.88.0 — Gate Bypass and Clean Build — 2 November 2026
 
 ### Added
