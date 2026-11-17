@@ -1174,9 +1174,9 @@ AfterglowAudioProcessor::getSequencerAnimatedNormalised(
     const int choice = afterglow::sequencer::targetChoiceForParameter(
         parameterId);
     if (choice <= 0
-        || choice > static_cast<int>(sequencerAnimatedNormalised.size()))
-        return std::nullopt;
-    if (load(raw.sequencerEnabled) < 0.5f
+        || choice > static_cast<int>(sequencerAnimatedNormalised.size())
+        || load(raw.bypass) >= 0.5f
+        || load(raw.sequencerEnabled) < 0.5f
         || ! isSequencerTargetAssigned(choice))
         return std::nullopt;
 

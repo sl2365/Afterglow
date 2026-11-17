@@ -1,5 +1,16 @@
 # Afterglow — Changelog
 
+## 1.89.1 — Bypassed Target Knob Display Fix — 17 November 2026
+
+### Fixed
+
+- Fixed assigned target knobs retaining the Sequencer's animated graphic position while Afterglow was switched off, even though their editable value and readout changed.
+- The animation overlay now disengages while Afterglow is bypassed, allowing each targeted knob graphic and value to follow manual adjustments together. Normal sequencer animation resumes when processing is switched back on.
+
+### Preserved
+
+- Kept audio bypass behaviour, sequencer assignments, target Depth values, DSP, parameters, presets and state schema unchanged.
+
 ## 1.89.0 — Logo Zoom Menu and Complete LED Glow — 16 November 2026
 
 ### Added
