@@ -1,5 +1,28 @@
 # Afterglow — Changelog
 
+## 1.90.0 — Dedicated Data Folder — 18 November 2026
+
+### Changed
+
+- Renamed the portable runtime folder beside the plug-in from `Afterglow` to `Afterglow_Data`, making it unambiguous that the folder contains user settings, presets and saved sequences rather than program files.
+- On first use, Afterglow automatically renames the complete existing `Afterglow` folder to `Afterglow_Data`.
+
+### Preserved
+
+- Audio processing, parameters, preset contents, sequencer state and preset schema remain unchanged.
+
+## 1.89.2 — Host-Bypass Target Display Fix — 17 November 2026
+
+### Fixed
+
+- Fixed sequencer-targeted knob graphics remaining frozen when Afterglow is bypassed or disabled by a host that stops calling the plug-in rather than changing its exposed Bypass parameter.
+- Added the standard bypassed-processing callback state and a lightweight audio-callback heartbeat. The animated overlay now releases when either host-bypass method is used, so manually adjusted knob graphics and values remain together.
+- Normal target animation resumes automatically when processing restarts.
+
+### Preserved
+
+- Kept sequencer modulation, target assignments, Depth values, audio bypass behaviour, delay DSP, parameters, presets and state schema unchanged.
+
 ## 1.89.1 — Bypassed Target Knob Display Fix — 17 November 2026
 
 ### Fixed

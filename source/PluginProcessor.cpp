@@ -9,6 +9,16 @@
 
 namespace
 {
+juce::File resolveDataDirectory(const juce::File& parentDirectory)
+{
+    const auto dataDirectory = parentDirectory.getChildFile("Afterglow_Data");
+    const auto legacyDirectory = parentDirectory.getChildFile("Afterglow");
+    if (legacyDirectory.isDirectory())
+        legacyDirectory.moveFileTo(dataDirectory);
+
+    return dataDirectory;
+}
+
 namespace ParameterIds
 {
 constexpr auto timeL = "timeL";
@@ -389,19 +399,20 @@ juce::File AfterglowAudioProcessor::getDataDirectory()
             for (int depth = 0; depth < 6; ++depth)
             {
                 if (folder.hasFileExtension(".vst3"))
-                    return folder.getParentDirectory().getChildFile("Afterglow");
+                    return resolveDataDirectory(folder.getParentDirectory());
 
                 const auto parent = folder.getParentDirectory();
                 if (parent == folder)
                     break;
                 folder = parent;
             }
-            return moduleFile.getParentDirectory().getChildFile("Afterglow");
+            return resolveDataDirectory(moduleFile.getParentDirectory());
         }
     }
 #endif
-    return juce::File::getSpecialLocation(juce::File::currentApplicationFile)
-        .getParentDirectory().getChildFile("Afterglow");
+    return resolveDataDirectory(
+        juce::File::getSpecialLocation(juce::File::currentApplicationFile)
+            .getParentDirectory());
 }
 
 juce::File AfterglowAudioProcessor::getSettingsDirectory()
@@ -1176,8 +1187,15 @@ AfterglowAudioProcessor::getSequencerAnimatedNormalised(
     if (choice <= 0
         || choice > static_cast<int>(sequencerAnimatedNormalised.size())
         || load(raw.bypass) >= 0.5f
+        || lastCallbackWasBypassed.load(std::memory_order_relaxed)
         || load(raw.sequencerEnabled) < 0.5f
         || ! isSequencerTargetAssigned(choice))
+        return std::nullopt;
+
+    const auto lastCallback = lastProcessBlockMs.load(
+        std::memory_order_relaxed);
+    const auto now = juce::Time::getMillisecondCounter();
+    if (lastCallback == 0 || now - lastCallback > 250u)
         return std::nullopt;
 
     const float value = sequencerAnimatedNormalised[
@@ -3220,6 +3238,9 @@ float AfterglowAudioProcessor::nextRandomModulation(RandomModulator& modulator,
 
 void AfterglowAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
+    lastProcessBlockMs.store(
+        juce::Time::getMillisecondCounter(), std::memory_order_relaxed);
+    lastCallbackWasBypassed.store(false, std::memory_order_relaxed);
     juce::ScopedNoDenormals noDenormals;
 
     const int sampleCount = buffer.getNumSamples();
@@ -6271,6 +6292,15 @@ void AfterglowAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
     if (! distortionTypeCrossfade.isSmoothing())
         previousDistortionType = currentDistortionType;
+}
+
+void AfterglowAudioProcessor::processBlockBypassed(
+    juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
+{
+    lastProcessBlockMs.store(
+        juce::Time::getMillisecondCounter(), std::memory_order_relaxed);
+    lastCallbackWasBypassed.store(true, std::memory_order_relaxed);
+    juce::AudioProcessor::processBlockBypassed(buffer, midi);
 }
 
 juce::AudioProcessorEditor* AfterglowAudioProcessor::createEditor()

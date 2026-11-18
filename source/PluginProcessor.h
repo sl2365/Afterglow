@@ -15,6 +15,8 @@ public:
     void releaseResources() override;
     using juce::AudioProcessor::processBlock;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlockBypassed(juce::AudioBuffer<float>&,
+                              juce::MidiBuffer&) override;
     bool isBusesLayoutSupported(const BusesLayout&) const override;
 
     juce::AudioProcessorEditor* createEditor() override;
@@ -289,6 +291,8 @@ private:
     std::array<float, delayChannelCount> twinTapeFreezePhase {};
     bool twinTapeFreezeActive = false;
     std::atomic<int> activeSequencerStep { -1 };
+    std::atomic<uint32_t> lastProcessBlockMs { 0 };
+    std::atomic<bool> lastCallbackWasBypassed { false };
     double sequencerFreePhase = 0.0;
     int sequencerHeldNotes = 0;
     bool sequencerPhraseTriggered = false;
