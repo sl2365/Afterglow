@@ -33,6 +33,12 @@ Project root: `_Projects\Afterglow`, beside the shared `_Projects\_Tools` folder
 
 The build uses JUCE 9.0.4, CMake 4.4.2 and Visual Studio Community 2026 x64 from the existing shared tool folders. It does not install the plugin automatically.
 
+## Requirements
+
+- Windows x64
+- A 64-bit VST3 host
+- A writable VST3 folder if Afterglow's portable settings, presets, sequences and Models are to remain beside the plugin
+
 ## Current delay modes
 
 ### Digital
