@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(Afterglow VERSION 1.90.0 LANGUAGES C CXX)
+project(Afterglow VERSION 1.91.5 LANGUAGES C CXX)
 
 set(JUCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../_Tools/JUCE/_9.0.4")
 if(NOT EXISTS "${JUCE_DIR}/CMakeLists.txt")
@@ -8,7 +8,7 @@ endif()
 add_subdirectory("${JUCE_DIR}" "${CMAKE_BINARY_DIR}/JUCE")
 
 juce_add_plugin(Afterglow
-    VERSION 1.90.0
+    VERSION 1.91.5
     COMPANY_NAME "sl23"
     BUNDLE_ID "com.sl23.afterglow"
     IS_SYNTH FALSE
@@ -25,12 +25,13 @@ juce_add_plugin(Afterglow
     PRODUCT_NAME "Afterglow")
 
 juce_add_binary_data(AfterglowResources
-    SOURCES "${CMAKE_CURRENT_LIST_DIR}/../Resources/logo.png")
+    SOURCES
+        "${CMAKE_CURRENT_LIST_DIR}/../Resources/logo.png")
 
 juce_generate_juce_header(Afterglow)
 target_sources(Afterglow PRIVATE
     PluginProcessor.cpp PluginProcessor.h
-    PluginEditor.cpp PluginEditor.h
+    PluginEditor.cpp PluginEditor.h MidiLearnIcon.h
     AfterglowSequencer.h)
 target_compile_features(Afterglow PRIVATE cxx_std_17)
 target_compile_definitions(Afterglow PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)

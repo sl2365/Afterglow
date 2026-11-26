@@ -5,11 +5,12 @@
 #include <array>
 #include <optional>
 
-class AfterglowAudioProcessor final : public juce::AudioProcessor
+class AfterglowAudioProcessor final : public juce::AudioProcessor,
+                                      private juce::AsyncUpdater
 {
 public:
     AfterglowAudioProcessor();
-    ~AfterglowAudioProcessor() override = default;
+    ~AfterglowAudioProcessor() override;
 
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -52,6 +53,22 @@ public:
     }
     std::optional<float> getSequencerAnimatedNormalised(
         const juce::String& parameterId) const noexcept;
+    bool beginMidiLearn(const juce::String& parameterId) noexcept;
+    void cancelMidiLearn() noexcept;
+    bool isMidiLearnPending(const juce::String& parameterId) const noexcept;
+    bool assignMidiCcToParameter(const juce::String& parameterId,
+                                 int cc, int value) noexcept;
+    int getMidiCcForParameter(const juce::String& parameterId) const noexcept;
+    void clearMidiMapping(const juce::String& parameterId) noexcept;
+    uint32_t getMidiMappingRevision() const noexcept
+    {
+        return midiMappingRevision.load(std::memory_order_relaxed);
+    }
+    uint32_t getLastMidiCcToken() const noexcept
+    {
+        return lastMidiCcToken.load(std::memory_order_acquire);
+    }
+    void saveMidiMappingsIfNeeded();
 
 private:
     static constexpr int stateSchemaVersion = 43;
@@ -233,6 +250,11 @@ private:
     static float nextNoiseSample(uint32_t& state) noexcept;
     static float processAllpass(float sample, float coefficient,
                                 AllpassState& state) noexcept;
+    int findParameterIndex(const juce::String& parameterId) const noexcept;
+    void processMidiControllers(const juce::MidiBuffer&) noexcept;
+    void handleAsyncUpdate() override;
+    void loadMidiMappings();
+    void saveMidiMappings();
 
     static float load(const std::atomic<float>*) noexcept;
     static float onePoleCoefficient(float cutoffHz, double sampleRate) noexcept;
@@ -615,6 +637,12 @@ private:
     mutable juce::CriticalSection savedParameterStateLock;
     juce::ValueTree savedParameterState;
     std::atomic<bool> pendingProcessingReset { false };
+    std::array<std::atomic<int>, 128> midiCcParameterIndices {};
+    std::array<std::atomic<int>, 128> pendingMidiCcValues {};
+    std::atomic<int> midiLearnTargetParameterIndex { -1 };
+    std::atomic<uint32_t> midiMappingRevision { 0 };
+    std::atomic<uint32_t> lastMidiCcToken { 0 };
+    std::atomic<bool> midiMappingsDirty { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AfterglowAudioProcessor)
 };

@@ -22,6 +22,7 @@ private:
     {
     public:
         std::function<bool()> onSavedStateReset;
+        std::function<bool()> onDefaultStateReset;
 
         void setCentreDetent(double value, double radius)
         {
@@ -48,8 +49,23 @@ private:
             return attemptedValue;
         }
 
+        void mouseDown(const juce::MouseEvent& event) override
+        {
+            if (event.mods.isMiddleButtonDown())
+            {
+                if (onDefaultStateReset != nullptr)
+                    onDefaultStateReset();
+                return;
+            }
+
+            juce::Slider::mouseDown(event);
+        }
+
         void mouseDoubleClick(const juce::MouseEvent& event) override
         {
+            if (! event.mods.isLeftButtonDown())
+                return;
+
             if (onSavedStateReset != nullptr && onSavedStateReset())
                 return;
 
@@ -151,6 +167,7 @@ private:
         juce::String parameterId;
     };
     class SequencerPanel;
+    class MidiLearnOverlay;
     class LookAndFeel final : public juce::LookAndFeel_V4
     {
     public:
@@ -181,7 +198,6 @@ private:
         {
             return popupBorderColour;
         }
-
     private:
         juce::Colour popupBorderColour { 0xff1479b8 };
         bool useCompactPopupFont = false;
@@ -256,8 +272,10 @@ private:
     juce::Label echoOffsetLabel;
     std::unique_ptr<SliderAttachment> echoOffsetAttachment;
     juce::ToggleButton randomButton { "!!!" };
+    juce::ToggleButton midiLearnButton;
     juce::ToggleButton sequencerButton { "SEQ" };
     std::unique_ptr<SequencerPanel> sequencerPanel;
+    std::unique_ptr<MidiLearnOverlay> midiLearnOverlay;
     std::unique_ptr<FolderTreeItem> presetFolderRoot;
     std::unique_ptr<juce::FileChooser> presetFileChooser;
     std::unique_ptr<juce::AlertWindow> presetFolderNameWindow;
@@ -291,6 +309,7 @@ private:
     void refreshPresetList();
     void updatePresetNavigationDisplay();
     void setSequencerOpen(bool);
+    void setMidiLearnMode(bool);
     void updateSequencerTargetHighlights();
     void updateAnimatedParameterDisplays();
     void randomiseDelayParameters();
@@ -333,6 +352,7 @@ private:
     bool presetBrowserOpen = false;
     bool favouritesViewSelected = false;
     bool sequencerOpen = false;
+    bool midiLearnMode = false;
     bool previousPresetKeyDown = false;
     bool nextPresetKeyDown = false;
     int selectedPresetBrowserColumn = 0;

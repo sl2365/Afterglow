@@ -1,5 +1,86 @@
 # Afterglow — Changelog
 
+## 1.91.5 — Vector MIDI Icon — 26 November 2026
+
+### Changed
+
+- Replaced the raster MIDI Learn button artwork with the exact vector MIDI socket used by Transform. Its continuous socket outline, keyway and five pins now remain crisp at normal zoom and every supported GUI scale.
+- Removed the obsolete MIDI PNG decoding, transparent-margin scan, image resampling and embedded MIDI raster resource from the plug-in.
+
+### Preserved
+
+- MIDI Learn styling, assignment behaviour, mappings, button size and position, audio processing, parameters, presets, sequencer behaviour and preset schema remain unchanged.
+
+## 1.91.4 — Unified MIDI Learn Styling — 26 November 2026
+
+### Changed
+
+- Matched Transform's MIDI Learn presentation exactly: available destinations use the same blue outlines, the currently armed destination uses the same yellow outline, and circles and rounded rectangles use the same corner radii, opacity and stroke widths.
+- Matched Transform's CC-number badges exactly, including their size, lower-centre placement, blue fill and border, white 9 px bold text and rounded corners.
+- Matched Transform's rotary highlight geometry so the rings follow the visible dial body consistently instead of the complete slider component bounds.
+
+### Preserved
+
+- MIDI learning, existing assignments, controller response, audio processing, parameter identities, presets, sequencer behaviour and preset schema remain unchanged.
+
+## 1.91.3 — Sustained MIDI Control — 26 November 2026
+
+### Fixed
+
+- Moved learned MIDI CC parameter updates out of the real-time audio callback and onto JUCE's coalesced asynchronous message path. Hosts no longer receive parameter-change notifications re-entrantly from their own audio processing call, preventing learned controls from working briefly and then becoming unresponsive.
+- Retained the latest value for each mapped CC during bursts, so rapid hardware movement remains responsive without creating an unbounded event queue.
+
+### Preserved
+
+- MIDI capture, learning, existing mappings, MIDI Learn presentation, audio processing, presets, sequencer behaviour and preset schema remain unchanged.
+
+## 1.91.2 — MIDI Learn Presentation — 26 November 2026
+
+### Fixed
+
+- Kept the exact supplied MIDI artwork while removing only its unused transparent margin at load time. The icon now uses the complete available button area and high-quality resampling, preventing its thin circular line from breaking up at 100% GUI scale.
+- Moved each learned CC-number badge from the upper-left to the horizontal centre of the associated control's lower edge.
+- Matched the gap from MIDI Learn to Random to the existing gap from Random to SEQ.
+- Inset the adjoining Link L/R and Ping-Pong MIDI Learn outlines so their deliberately overlapping component bounds no longer produce overlapping rectangles.
+
+### Preserved
+
+- MIDI Learn assignment, mappings, audio processing, parameter identities, presets, sequencer behaviour and preset schema remain unchanged.
+
+## 1.91.1 — MIDI Learn Reliability and Exact Icon — 26 November 2026
+
+### Fixed
+
+- Changed MIDI Learn to the proven two-stage input path: the audio processor records each incoming CC and the editor completes the armed assignment on its timer. This removes the audio-thread assignment race that prevented hardware controls from being learned reliably.
+- The first learned CC value is applied immediately, while later movements continue through the normal mapped parameter path.
+- Changed the Sequencer Start/End Link control to the same warm-yellow outlined active styling as the other requested active buttons while preserving its dark off state.
+
+### Changed
+
+- Replaced the reconstructed MIDI symbol with the exact supplied `Resources/midi.png` artwork. The original PNG bytes are embedded in the plug-in and scaled only to fit the button.
+
+### Preserved
+
+- Existing MIDI mapping files, parameter identities, audio processing, presets, sequencer behaviour and preset schema remain unchanged.
+
+## 1.91.0 — MIDI Learn and Init Reset — 26 November 2026
+
+### Added
+
+- Added a compact MIDI-socket button between Echo Offset and Random. MIDI Learn outlines every supported visible delay and sequencer parameter, displays existing CC assignments in numbered badges and lets a highlighted destination learn the next received MIDI CC.
+- Added right-click clearing for MIDI Learn targets. CC mappings are exclusive, independent of presets and stored globally by stable parameter ID in `Afterglow_Data\Settings\MidiLearn.ini`.
+- Added middle-click factory reset for individual parameters, returning the selected control to its Init-state default without disturbing the rest of the current preset.
+
+### Changed
+
+- Restricted preset-state double-click reset to the left mouse button. Target Depth controls now follow the same saved-state reset behaviour instead of always returning to 100%.
+- Restyled the logo Zoom menu with the same popup treatment and current-mode border colour as the Mode and Dist Type menus.
+- Gave Preset Browser and SEQ the established yellow outlined active treatment while retaining their existing dark off state. Mix Lock retains its transparent button and yellow active icon.
+
+### Preserved
+
+- Audio processing, parameter identities, presets, sequencer behaviour and preset schema remain unchanged.
+
 ## 1.90.0 — Dedicated Data Folder — 18 November 2026
 
 ### Changed

@@ -25,7 +25,7 @@ set "BUNDLE_BINARY=%BUILD_DIR%\Afterglow_artefacts\Release\VST3\Afterglow.vst3\C
 set "FINAL_PLUGIN=%DIST_DIR%\Afterglow.vst3"
 
 echo.
-echo Afterglow 64-bit VST3 - v1.90.0 Build
+echo Afterglow 64-bit VST3 - v1.91.5 Build
 echo ======================================
 echo.
 
@@ -45,6 +45,7 @@ for %%F in (CMakeLists.txt PluginProcessor.cpp PluginProcessor.h PluginEditor.cp
     if not exist "%SOURCE_DIR%\%%F" goto :missing_source
 )
 if not exist "%PROJECT_ROOT%Resources\logo.png" goto :missing_logo
+if not exist "%PROJECT_ROOT%Resources\midi.png" goto :missing_midi
 echo       PASS
 echo.
 echo [2/4] Configuring Visual Studio Community 2026 x64...
@@ -94,6 +95,9 @@ echo FAIL: Required source file missing from %SOURCE_DIR%
 goto :failed
 :missing_logo
 echo FAIL: Required logo missing: %PROJECT_ROOT%Resources\logo.png
+goto :failed
+:missing_midi
+echo FAIL: Required MIDI icon missing: %PROJECT_ROOT%Resources\midi.png
 goto :failed
 :configure_failed
 echo FAIL: Configuration failed.

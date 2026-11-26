@@ -370,6 +370,10 @@ AfterglowAudioProcessor::AfterglowAudioProcessor()
                                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       parameters(*this, nullptr, "AfterglowParameters", createParameterLayout())
 {
+    for (auto& mapping : midiCcParameterIndices)
+        mapping.store(-1, std::memory_order_relaxed);
+    for (auto& value : pendingMidiCcValues)
+        value.store(-1, std::memory_order_relaxed);
     bindParameterPointers();
     for (auto& value : sequencerAnimatedNormalised)
         value.store(-1.0f, std::memory_order_relaxed);
@@ -378,6 +382,229 @@ AfterglowAudioProcessor::AfterglowAudioProcessor()
     getSettingsDirectory().createDirectory();
     getPresetsDirectory().createDirectory();
     getSequencesDirectory().createDirectory();
+    loadMidiMappings();
+}
+
+AfterglowAudioProcessor::~AfterglowAudioProcessor()
+{
+    cancelPendingUpdate();
+    saveMidiMappingsIfNeeded();
+}
+
+int AfterglowAudioProcessor::findParameterIndex(
+    const juce::String& parameterId) const noexcept
+{
+    const auto* requested = parameters.getParameter(parameterId);
+    if (requested == nullptr)
+        return -1;
+
+    const auto& processorParameters = getParameters();
+    for (int index = 0; index < processorParameters.size(); ++index)
+        if (processorParameters[index] == requested)
+            return index;
+    return -1;
+}
+
+bool AfterglowAudioProcessor::beginMidiLearn(
+    const juce::String& parameterId) noexcept
+{
+    const int index = findParameterIndex(parameterId);
+    midiLearnTargetParameterIndex.store(index, std::memory_order_release);
+    return index >= 0;
+}
+
+void AfterglowAudioProcessor::cancelMidiLearn() noexcept
+{
+    midiLearnTargetParameterIndex.store(-1, std::memory_order_release);
+}
+
+bool AfterglowAudioProcessor::isMidiLearnPending(
+    const juce::String& parameterId) const noexcept
+{
+    return midiLearnTargetParameterIndex.load(std::memory_order_acquire)
+        == findParameterIndex(parameterId);
+}
+
+bool AfterglowAudioProcessor::assignMidiCcToParameter(
+    const juce::String& parameterId, int cc, int value) noexcept
+{
+    const int parameterIndex = findParameterIndex(parameterId);
+    if (parameterIndex < 0 || ! juce::isPositiveAndBelow(cc, 128))
+        return false;
+
+    for (auto& mapping : midiCcParameterIndices)
+    {
+        int expected = parameterIndex;
+        mapping.compare_exchange_strong(
+            expected, -1, std::memory_order_acq_rel);
+    }
+    midiCcParameterIndices[static_cast<size_t>(cc)].store(
+        parameterIndex, std::memory_order_release);
+    midiLearnTargetParameterIndex.store(-1, std::memory_order_release);
+    midiMappingsDirty.store(true, std::memory_order_release);
+    midiMappingRevision.fetch_add(1, std::memory_order_acq_rel);
+
+    const auto& processorParameters = getParameters();
+    if (juce::isPositiveAndBelow(parameterIndex,
+                                 processorParameters.size()))
+        processorParameters[parameterIndex]->setValueNotifyingHost(
+            static_cast<float>(juce::jlimit(0, 127, value)) / 127.0f);
+    return true;
+}
+
+int AfterglowAudioProcessor::getMidiCcForParameter(
+    const juce::String& parameterId) const noexcept
+{
+    const int parameterIndex = findParameterIndex(parameterId);
+    if (parameterIndex < 0)
+        return -1;
+
+    for (int cc = 0; cc < static_cast<int>(midiCcParameterIndices.size());
+         ++cc)
+        if (midiCcParameterIndices[static_cast<size_t>(cc)].load(
+                std::memory_order_acquire) == parameterIndex)
+            return cc;
+    return -1;
+}
+
+void AfterglowAudioProcessor::clearMidiMapping(
+    const juce::String& parameterId) noexcept
+{
+    const int parameterIndex = findParameterIndex(parameterId);
+    if (parameterIndex < 0)
+        return;
+
+    bool changed = false;
+    for (auto& mapping : midiCcParameterIndices)
+    {
+        int expected = parameterIndex;
+        if (mapping.compare_exchange_strong(
+                expected, -1, std::memory_order_acq_rel))
+            changed = true;
+    }
+    if (changed)
+    {
+        midiMappingsDirty.store(true, std::memory_order_release);
+        midiMappingRevision.fetch_add(1, std::memory_order_acq_rel);
+    }
+}
+
+void AfterglowAudioProcessor::processMidiControllers(
+    const juce::MidiBuffer& midi) noexcept
+{
+    for (const auto metadata : midi)
+    {
+        const auto message = metadata.getMessage();
+        if (! message.isController())
+            continue;
+
+        const int cc = juce::jlimit(0, 127, message.getControllerNumber());
+        const int value = juce::jlimit(0, 127,
+                                      message.getControllerValue());
+        const uint32_t previousToken = lastMidiCcToken.load(
+            std::memory_order_relaxed);
+        const uint32_t sequence = ((previousToken >> 14) + 1u) & 0x3ffffu;
+        lastMidiCcToken.store((sequence << 14)
+                                | (static_cast<uint32_t>(cc) << 7)
+                                | static_cast<uint32_t>(value),
+                              std::memory_order_release);
+
+        const int parameterIndex =
+            midiCcParameterIndices[static_cast<size_t>(cc)].load(
+                std::memory_order_acquire);
+        if (parameterIndex >= 0)
+        {
+            pendingMidiCcValues[static_cast<size_t>(cc)].store(
+                value, std::memory_order_release);
+            triggerAsyncUpdate();
+        }
+    }
+}
+
+void AfterglowAudioProcessor::handleAsyncUpdate()
+{
+    const auto& processorParameters = getParameters();
+    for (int cc = 0; cc < static_cast<int>(pendingMidiCcValues.size()); ++cc)
+    {
+        const int value = pendingMidiCcValues[static_cast<size_t>(cc)]
+            .exchange(-1, std::memory_order_acq_rel);
+        if (value < 0)
+            continue;
+
+        const int parameterIndex =
+            midiCcParameterIndices[static_cast<size_t>(cc)].load(
+                std::memory_order_acquire);
+        if (! juce::isPositiveAndBelow(parameterIndex,
+                                       processorParameters.size()))
+            continue;
+
+        const float normalised = static_cast<float>(value) / 127.0f;
+        auto* parameter = processorParameters[parameterIndex];
+        if (! juce::approximatelyEqual(parameter->getValue(), normalised))
+            parameter->setValueNotifyingHost(normalised);
+    }
+}
+
+void AfterglowAudioProcessor::loadMidiMappings()
+{
+    const auto file = getSettingsDirectory().getChildFile("MidiLearn.ini");
+    if (! file.existsAsFile())
+        return;
+
+    juce::StringArray lines;
+    lines.addLines(file.loadFileAsString());
+    for (auto line : lines)
+    {
+        line = line.trim();
+        if (! line.startsWithIgnoreCase("CC"))
+            continue;
+        const int separator = line.indexOfChar('=');
+        if (separator <= 2)
+            continue;
+        const int cc = line.substring(2, separator).getIntValue();
+        const int parameterIndex = findParameterIndex(
+            line.substring(separator + 1).trim());
+        if (juce::isPositiveAndBelow(
+                cc, static_cast<int>(midiCcParameterIndices.size()))
+            && parameterIndex >= 0)
+            midiCcParameterIndices[static_cast<size_t>(cc)].store(
+                parameterIndex, std::memory_order_relaxed);
+    }
+}
+
+void AfterglowAudioProcessor::saveMidiMappings()
+{
+    const auto directory = getSettingsDirectory();
+    if (! directory.isDirectory() && directory.createDirectory().failed())
+        return;
+
+    juce::String text;
+    text << "; Afterglow MIDI CC assignments\r\n[MIDI Learn]\r\n";
+    const auto& processorParameters = getParameters();
+    for (int cc = 0; cc < static_cast<int>(midiCcParameterIndices.size());
+         ++cc)
+    {
+        const int parameterIndex =
+            midiCcParameterIndices[static_cast<size_t>(cc)].load(
+                std::memory_order_acquire);
+        if (! juce::isPositiveAndBelow(parameterIndex,
+                                       processorParameters.size()))
+            continue;
+        if (const auto* parameter = dynamic_cast<
+                const juce::AudioProcessorParameterWithID*>(
+                    processorParameters[parameterIndex]))
+            text << "CC" << cc << "=" << parameter->getParameterID()
+                 << "\r\n";
+    }
+
+    if (directory.getChildFile("MidiLearn.ini").replaceWithText(text))
+        midiMappingsDirty.store(false, std::memory_order_release);
+}
+
+void AfterglowAudioProcessor::saveMidiMappingsIfNeeded()
+{
+    if (midiMappingsDirty.load(std::memory_order_acquire))
+        saveMidiMappings();
 }
 
 juce::File AfterglowAudioProcessor::getDataDirectory()
@@ -3242,6 +3469,7 @@ void AfterglowAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         juce::Time::getMillisecondCounter(), std::memory_order_relaxed);
     lastCallbackWasBypassed.store(false, std::memory_order_relaxed);
     juce::ScopedNoDenormals noDenormals;
+    processMidiControllers(midi);
 
     const int sampleCount = buffer.getNumSamples();
     const int hostChannelCount = buffer.getNumChannels();
@@ -6300,6 +6528,7 @@ void AfterglowAudioProcessor::processBlockBypassed(
     lastProcessBlockMs.store(
         juce::Time::getMillisecondCounter(), std::memory_order_relaxed);
     lastCallbackWasBypassed.store(true, std::memory_order_relaxed);
+    processMidiControllers(midi);
     juce::AudioProcessor::processBlockBypassed(buffer, midi);
 }
 

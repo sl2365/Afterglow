@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include "MidiLearnIcon.h"
 #include <BinaryData.h>
 #include <algorithm>
 #include <cmath>
@@ -1302,9 +1303,23 @@ public:
             const int visibleRow = row - firstVisibleRow;
             if (depthBoundsForVisibleRow(visibleRow).contains(event.getPosition()))
             {
-                draggedDepthParameter = depths[static_cast<size_t>(slot)];
-                if (draggedDepthParameter != nullptr)
+                auto* depthParameter = depths[static_cast<size_t>(slot)];
+                if (depthParameter == nullptr)
+                    return;
+                if (event.mods.isMiddleButtonDown())
                 {
+                    depthParameter->beginChangeGesture();
+                    depthParameter->setValueNotifyingHost(
+                        depthParameter->getDefaultValue());
+                    depthParameter->endChangeGesture();
+                    setDepthTooltip(depthParameter->convertFrom0to1(
+                        depthParameter->getValue()));
+                    repaint();
+                    return;
+                }
+                if (event.mods.isLeftButtonDown())
+                {
+                    draggedDepthParameter = depthParameter;
                     dragStartDepth = depthForSlot(slot);
                     dragStartY = event.y;
                     draggedDepthParameter->beginChangeGesture();
@@ -1346,6 +1361,9 @@ public:
 
         void mouseDoubleClick(const juce::MouseEvent& event) override
         {
+            if (! event.mods.isLeftButtonDown())
+                return;
+
             const int row = (event.y - 20) / rowHeight + firstVisibleRow;
             const auto slots = assignedSlots();
             if (event.y < 20
@@ -1362,13 +1380,18 @@ public:
                 slots[static_cast<size_t>(row)])];
             if (parameter == nullptr)
                 return;
+            const auto saved = processor.getSavedParameterValue(
+                parameter->getParameterID());
+            if (! saved.has_value())
+                return;
             if (draggedDepthParameter != nullptr)
             {
                 draggedDepthParameter->endChangeGesture();
                 draggedDepthParameter = nullptr;
             }
             parameter->beginChangeGesture();
-            parameter->setValueNotifyingHost(parameter->getDefaultValue());
+            parameter->setValueNotifyingHost(
+                parameter->convertTo0to1(*saved));
             parameter->endChangeGesture();
             setDepthTooltip(parameter->convertFrom0to1(
                 parameter->getValue()));
@@ -1642,6 +1665,28 @@ public:
         longGateSlider.setName("Long");
         grid.setName("Steps");
         targets.setName("Targets");
+        const auto midiTarget = [](juce::Component& component,
+                                   const char* parameterId)
+        {
+            component.getProperties().set("midiParameterId", parameterId);
+        };
+        midiTarget(hostSync, "sequencerHostSync");
+        midiTarget(enabledButton, "sequencerEnabled");
+        midiTarget(rateSlider, "sequencerRate");
+        midiTarget(startSlider, "sequencerStart");
+        midiTarget(endSlider, "sequencerEnd");
+        midiTarget(rangeLinkButton, "sequencerRangeLink");
+        midiTarget(directionBox, "sequencerDirection");
+        midiTarget(shortGateSlider, "sequencerGateShortLength");
+        midiTarget(longGateSlider, "sequencerGateLongLength");
+        midiTarget(gateModeButton, "sequencerGateMode");
+        midiTarget(attackSlider, "sequencerAttack");
+        midiTarget(releaseSlider, "sequencerRelease");
+        midiTarget(peakSlider, "sequencerPeak");
+        midiTarget(moveSlider, "sequencerMove");
+        midiTarget(colourSlider, "sequencerHue");
+        midiTarget(saturationSlider, "sequencerSaturation");
+        midiTarget(luminanceSlider, "sequencerLuminance");
         for (auto* button : { &hostSync, &enabledButton, &bipolarButton,
                               &animateButton })
         {
@@ -1685,7 +1730,8 @@ public:
         rangeLinkButton.getProperties().set("rangeLinkIcon", true);
         rangeLinkButton.getProperties().set("compactRangeLink", true);
         rangeLinkButton.getProperties().set("activeColour",
-                                             controlAccentColour.toString());
+                                             knobIndicatorColour.toString());
+        rangeLinkButton.getProperties().set("outlinedActiveStyle", true);
         nudgeLeft.onClick = [this] { grid.nudge(-1); };
         nudgeRight.onClick = [this] { grid.nudge(1); };
         gateNudgeLeft.onClick = [this] { grid.nudgeGates(-1); };
@@ -1921,6 +1967,9 @@ public:
             "sequencerSaturation", saturationSlider);
         luminanceAttachment = makeSliderAttachment(
             "sequencerLuminance", luminanceSlider);
+        configureSavedReset(colourSlider, "sequencerHue");
+        configureSavedReset(saturationSlider, "sequencerSaturation");
+        configureSavedReset(luminanceSlider, "sequencerLuminance");
 
         rateAttachment = makeSliderAttachment("sequencerRate", rateSlider);
         startAttachment = makeSliderAttachment("sequencerStart", startSlider);
@@ -2380,12 +2429,25 @@ private:
 
     void configureSavedReset(DetentedSlider& slider, juce::String id)
     {
-        slider.onSavedStateReset = [this, &slider, id = std::move(id)]
+        slider.onSavedStateReset = [this, &slider, id]
         {
             const auto saved = processor.getSavedParameterValue(id);
             if (! saved.has_value())
                 return false;
             slider.setValue(*saved, juce::sendNotificationSync);
+            return true;
+        };
+        slider.onDefaultStateReset = [this, &slider, id]
+        {
+            auto* parameter = processor.parameters.getParameter(id);
+            if (parameter == nullptr)
+                return false;
+            slider.setValue(
+                parameter->convertFrom0to1(parameter->getDefaultValue()),
+                juce::sendNotificationSync);
+            if (showHelp != nullptr)
+                showHelp("INIT DEFAULT: " + slider.getName().toUpperCase()
+                    + "\nMiddle-click returned this parameter to its Init value.");
             return true;
         };
     }
@@ -2593,9 +2655,9 @@ private:
     ParameterDragLabel moveLabel;
     ParameterDragLabel shortGateLabel;
     ParameterDragLabel longGateLabel;
-    juce::Slider colourSlider;
-    juce::Slider saturationSlider;
-    juce::Slider luminanceSlider;
+    DetentedSlider colourSlider;
+    DetentedSlider saturationSlider;
+    DetentedSlider luminanceSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
         hostSyncAttachment, enabledAttachment,
         rangeLinkAttachment;
@@ -2617,6 +2679,244 @@ private:
     bool updatingGateModeParameter = false;
     bool updatingLinkedRange = false;
     bool sequencerControlsEnabled = true;
+};
+
+class AfterglowAudioProcessorEditor::MidiLearnOverlay final
+    : public juce::Component
+{
+public:
+    explicit MidiLearnOverlay(AfterglowAudioProcessorEditor& owner)
+        : editor(owner)
+    {
+        setName("MIDI Learn Overlay");
+        setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    }
+
+    void setLearningEnabled(bool shouldEnable)
+    {
+        if (! shouldEnable)
+        {
+            editor.processor.cancelMidiLearn();
+            armedParameterId.clear();
+            armedControlName.clear();
+        }
+        setVisible(shouldEnable);
+        setInterceptsMouseClicks(shouldEnable, shouldEnable);
+        repaint();
+    }
+
+    void timerTick()
+    {
+        if (! isVisible())
+            return;
+
+        const uint32_t midiToken = editor.processor.getLastMidiCcToken();
+        if (armedParameterId.isNotEmpty() && midiToken != armedMidiToken)
+        {
+            const int cc = static_cast<int>((midiToken >> 7) & 0x7fu);
+            const int value = static_cast<int>(midiToken & 0x7fu);
+            if (editor.processor.assignMidiCcToParameter(
+                    armedParameterId, cc, value))
+                editor.information.setText(
+                    "MIDI LEARN: " + armedControlName.toUpperCase()
+                        + " = CC " + juce::String(cc)
+                        + "\nAssignment saved globally in Afterglow_Data\\Settings\\MidiLearn.ini.",
+                    juce::dontSendNotification);
+            armedParameterId.clear();
+            armedControlName.clear();
+        }
+        repaint();
+    }
+
+    void paint(juce::Graphics& graphics) override
+    {
+        for (const auto& target : targets())
+        {
+            const bool armed = target.parameterId == armedParameterId;
+            const int cc = editor.processor.getMidiCcForParameter(
+                target.parameterId);
+            const auto colour = armed ? juce::Colour(0xffffd46a)
+                                      : juce::Colour(0xff69bfff);
+            graphics.setColour(colour.withAlpha(
+                cc >= 0 || armed ? 1.0f : 0.7f));
+            if (target.round)
+                graphics.drawEllipse(target.bounds, 1.5f);
+            else
+                graphics.drawRoundedRectangle(target.bounds, 2.0f, 1.3f);
+
+            if (cc >= 0)
+            {
+                const auto badge = juce::Rectangle<float>(22.0f, 12.0f)
+                    .withCentre({ target.bounds.getCentreX(),
+                                  target.bounds.getBottom() - 3.0f });
+                graphics.setColour(juce::Colour(0xff316b9f));
+                graphics.fillRoundedRectangle(badge, 3.0f);
+                graphics.setColour(juce::Colour(0xffa8d8ff));
+                graphics.drawRoundedRectangle(badge, 3.0f, 0.8f);
+                graphics.setColour(juce::Colours::white);
+                graphics.setFont(juce::Font(juce::FontOptions(
+                    9.0f, juce::Font::bold)));
+                graphics.drawText(juce::String(cc), badge.toNearestInt(),
+                                  juce::Justification::centred, false);
+            }
+        }
+    }
+
+    void mouseDown(const juce::MouseEvent& event) override
+    {
+        const auto availableTargets = targets();
+        for (auto target = availableTargets.rbegin();
+             target != availableTargets.rend(); ++target)
+        {
+            if (! target->bounds.contains(event.position))
+                continue;
+
+            if (event.mods.isPopupMenu())
+            {
+                editor.processor.clearMidiMapping(target->parameterId);
+                if (armedParameterId == target->parameterId)
+                {
+                    editor.processor.cancelMidiLearn();
+                    armedParameterId.clear();
+                    armedControlName.clear();
+                }
+                editor.information.setText(
+                    "MIDI LEARN: " + target->name.toUpperCase()
+                        + " CLEARED\nRight-click removed this control's MIDI CC assignment.",
+                    juce::dontSendNotification);
+                repaint();
+                return;
+            }
+
+            if (event.mods.isLeftButtonDown()
+                && editor.processor.beginMidiLearn(target->parameterId))
+            {
+                armedParameterId = target->parameterId;
+                armedControlName = target->name;
+                armedMidiToken = editor.processor.getLastMidiCcToken();
+                editor.information.setText(
+                    "MIDI LEARN: " + target->name.toUpperCase()
+                        + "\nMove a MIDI CC to assign it; right-click the control to clear its assignment.",
+                    juce::dontSendNotification);
+                repaint();
+                return;
+            }
+        }
+    }
+
+private:
+    struct Target
+    {
+        juce::String parameterId;
+        juce::String name;
+        juce::Rectangle<float> bounds;
+        bool round = false;
+    };
+
+    void addTarget(std::vector<Target>& result, juce::Component& component,
+                   const juce::String& parameterId,
+                   const juce::String& requestedName = {},
+                   bool round = false) const
+    {
+        if (parameterId.isEmpty() || ! component.isShowing()
+            || ! component.isEnabled())
+            return;
+
+        auto localArea = component.getLocalBounds();
+        if (round)
+        {
+            if (auto* slider = dynamic_cast<juce::Slider*>(&component))
+            {
+                auto sliderBounds = slider->getLookAndFeel()
+                    .getSliderLayout(*slider).sliderBounds;
+                const int size = juce::jmin(sliderBounds.getWidth(),
+                                            sliderBounds.getHeight());
+                const int diameter = juce::jmin(
+                    size, juce::roundToInt(size * 0.8f + 7.0f));
+                localArea = juce::Rectangle<int>(diameter, diameter)
+                    .withCentre(sliderBounds.getCentre());
+            }
+        }
+
+        auto area = getLocalArea(&component, localArea).toFloat();
+        if (! round)
+        {
+            if (parameterId == "link")
+                area.setRight(area.getRight() - 2.5f);
+            else if (parameterId == "pingPong")
+                area.setLeft(area.getX() + 2.5f);
+        }
+
+        auto name = requestedName.trim();
+        if (name.isEmpty())
+            name = component.getName().trim();
+        if (name.isEmpty())
+            name = parameterId;
+        result.push_back({ parameterId, name, area, round });
+    }
+
+    void collectPropertyTargets(juce::Component& parent,
+                                std::vector<Target>& result) const
+    {
+        for (int index = 0; index < parent.getNumChildComponents(); ++index)
+        {
+            auto* child = parent.getChildComponent(index);
+            if (child == nullptr || child == this
+                || child == &editor.midiLearnButton)
+                continue;
+            const auto parameterId = child->getProperties()
+                .getWithDefault("midiParameterId", juce::var())
+                .toString();
+            if (parameterId.isNotEmpty())
+            {
+                const auto* slider = dynamic_cast<const juce::Slider*>(child);
+                const bool round = slider != nullptr
+                    && slider->getSliderStyle()
+                        == juce::Slider::RotaryHorizontalVerticalDrag;
+                addTarget(result, *child, parameterId, {}, round);
+            }
+            collectPropertyTargets(*child, result);
+        }
+    }
+
+    std::vector<Target> targets() const
+    {
+        std::vector<Target> result;
+        result.reserve(editor.dials.size() + 32);
+        for (const auto& dial : editor.dials)
+            if (dial != nullptr && dial->parameterId.isNotEmpty())
+                addTarget(result, dial->slider, dial->parameterId,
+                          dial->label.getText(), true);
+
+        addTarget(result, editor.modeBox, "mode", "Mode");
+        addTarget(result, editor.distortionTypeBox, "distortionType",
+                  "Dist Type");
+        addTarget(result, editor.freezeButton, "freeze", "Freeze");
+        addTarget(result, editor.freezeModeButton, "freezeToggle",
+                  "Freeze Mode");
+        addTarget(result, editor.linkButton, "link", "Link L/R");
+        addTarget(result, editor.syncLeftButton, "syncL", "Left Tempo Sync");
+        addTarget(result, editor.syncRightButton, "syncR", "Right Tempo Sync");
+        addTarget(result, editor.pingPongButton, "pingPong", "Ping-Pong");
+        addTarget(result, editor.multiTapButton, "multiTap", "Multi-Tap");
+        addTarget(result, editor.multiTapSyncButton, "multiTapSync",
+                  "Multi-Tap Sync");
+        for (size_t tap = 0; tap < multiTapCount; ++tap)
+            addTarget(result, editor.tapEnableButtons[tap],
+                      tapEnabledParameterIds[tap],
+                      "Tap " + juce::String(static_cast<int>(tap) + 1)
+                          + " On");
+        addTarget(result, editor.bypassButton, "bypass", "Power");
+        addTarget(result, editor.echoOffsetSlider, "echoOffset",
+                  "Echo Offset");
+        collectPropertyTargets(editor.content, result);
+        return result;
+    }
+
+    AfterglowAudioProcessorEditor& editor;
+    juce::String armedParameterId;
+    juce::String armedControlName;
+    uint32_t armedMidiToken = 0;
 };
 
 void AfterglowAudioProcessorEditor::PresetDisplayLabel::paint(
@@ -2941,12 +3241,16 @@ void AfterglowAudioProcessorEditor::LookAndFeel::drawToggleButton(
         button.getProperties().getWithDefault("rangeLinkIcon", false));
     const bool randomIcon = static_cast<bool>(
         button.getProperties().getWithDefault("randomIcon", false));
+    const bool midiIcon = static_cast<bool>(
+        button.getProperties().getWithDefault("midiIcon", false));
     const bool mixLockIcon = static_cast<bool>(
         button.getProperties().getWithDefault("mixLockIcon", false));
     const bool sequencerLabelStyle = static_cast<bool>(
         button.getProperties().getWithDefault("sequencerLabelStyle", false));
     const bool standardTextButton = static_cast<bool>(
         button.getProperties().getWithDefault("standardTextButton", false));
+    const bool outlinedActiveStyle = static_cast<bool>(
+        button.getProperties().getWithDefault("outlinedActiveStyle", false));
     const bool invisibleButton = static_cast<bool>(
         button.getProperties().getWithDefault("invisibleButton", false));
     if (invisibleButton)
@@ -2966,13 +3270,14 @@ void AfterglowAudioProcessorEditor::LookAndFeel::drawToggleButton(
 
     if (snowflakeIcon || listIcon || presetArrowDirection != 0
         || saveIcon || saveAsIcon || folderIcon || rangeLinkIcon
-        || randomIcon || mixLockIcon || standardTextButton)
+        || randomIcon || midiIcon || mixLockIcon || standardTextButton)
     {
         const auto buttonBounds = bounds.reduced(0.5f);
         if (! mixLockIcon)
         {
-            g.setColour(active && enabled ? activeColour.darker(0.32f)
-                                         : juce::Colour(0xff242a30));
+            g.setColour(active && enabled && ! outlinedActiveStyle
+                            ? activeColour.darker(0.32f)
+                            : juce::Colour(0xff242a30));
             g.fillRoundedRectangle(buttonBounds, 3.0f);
             g.setColour(active && enabled ? activeColour.brighter(0.12f)
                                          : (shouldDrawButtonAsHighlighted
@@ -2987,7 +3292,9 @@ void AfterglowAudioProcessorEditor::LookAndFeel::drawToggleButton(
             : presetArrowDirection != 0
             ? knobIndicatorColour.withAlpha(enabled ? 0.9f : 0.2f)
             : (enabled
-                   ? (active ? juce::Colours::white : knobValueColour)
+                   ? (active ? (outlinedActiveStyle
+                                    ? activeColour : juce::Colours::white)
+                             : knobValueColour)
                    : knobLabelColour.darker(0.45f));
         g.setColour(iconColour);
         if (mixLockIcon)
@@ -3002,6 +3309,11 @@ void AfterglowAudioProcessorEditor::LookAndFeel::drawToggleButton(
             g.setColour(juce::Colour(0xff242a30));
             g.fillEllipse(centre.x - 1.0f, centre.y + 1.0f,
                           2.0f, 2.0f);
+        }
+        else if (midiIcon)
+        {
+            afterglow::artwork::drawMidiLearnIcon(
+                g, bounds, knobLabelColour);
         }
         else if (randomIcon)
         {
@@ -3297,7 +3609,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Click the Afterglow logo to choose a GUI zoom factor from 75% to 300%");
     logoMenuButton.onClick = [this] { showLogoZoomMenu(); };
     content.addAndMakeVisible(logoMenuButton);
-    versionLabel.setText("v1.90.0", juce::dontSendNotification);
+    versionLabel.setText("v1.91.5", juce::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
     versionLabel.setColour(juce::Label::textColourId, knobIndicatorColour);
     versionLabel.setFont(juce::Font(juce::FontOptions(8.5f, juce::Font::bold)));
@@ -3923,7 +4235,8 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Open or close the preset browser");
     presetBrowserButton.getProperties().set("listIcon", true);
     presetBrowserButton.getProperties().set(
-        "activeColour", presetAccentColour.toString());
+        "activeColour", knobIndicatorColour.toString());
+    presetBrowserButton.getProperties().set("outlinedActiveStyle", true);
     presetBrowserButton.setClickingTogglesState(true);
     content.addAndMakeVisible(presetBrowserButton);
     presetBrowserButton.onClick = [this]
@@ -4039,7 +4352,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
                 juce::dontSendNotification);
     };
 
-    information.setText("AFTERGLOW 1.90.0 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
+    information.setText("AFTERGLOW 1.91.5 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
     information.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
     information.setJustificationType(juce::Justification::centredLeft);
     information.setFont(juce::FontOptions(11.5f));
@@ -4102,6 +4415,22 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         echoOffsetSlider.setValue(*saved, juce::sendNotificationSync);
         return true;
     };
+    echoOffsetSlider.onDefaultStateReset = [this]
+    {
+        auto* parameter = processor.parameters.getParameter("echoOffset");
+        if (parameter == nullptr)
+            return false;
+        echoOffsetSlider.setValue(
+            parameter->convertFrom0to1(parameter->getDefaultValue()),
+            juce::sendNotificationSync);
+        information.setText(
+            "INIT DEFAULT: ECHO OFFSET = "
+                + echoOffsetSlider.getTextFromValue(
+                    echoOffsetSlider.getValue())
+                + "\nMiddle-click returned this parameter to its Init value.",
+            juce::dontSendNotification);
+        return true;
+    };
     content.addAndMakeVisible(echoOffsetSlider);
 
     randomButton.setClickingTogglesState(false);
@@ -4115,18 +4444,37 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
     randomButton.onClick = [this] { randomiseDelayParameters(); };
     content.addAndMakeVisible(randomButton);
 
+    midiLearnButton.setClickingTogglesState(true);
+    midiLearnButton.setName("MIDI Learn");
+    midiLearnButton.getProperties().set("midiIcon", true);
+    midiLearnButton.getProperties().set("outlinedActiveStyle", true);
+    midiLearnButton.getProperties().set("activeColour",
+                                        knobIndicatorColour.toString());
+    midiLearnButton.setTooltip(
+        "Show MIDI-controllable parameters, learn MIDI CC assignments and display assigned CC numbers");
+    midiLearnButton.onClick = [this]
+    {
+        setMidiLearnMode(midiLearnButton.getToggleState());
+    };
+    content.addAndMakeVisible(midiLearnButton);
+
     sequencerButton.setClickingTogglesState(true);
     sequencerButton.setName("Sequencer");
     sequencerButton.setToggleState(sequencerOpen, juce::dontSendNotification);
     sequencerButton.getProperties().set("standardTextButton", true);
     sequencerButton.getProperties().set("activeColour",
-                                        controlAccentColour.toString());
+                                        knobIndicatorColour.toString());
+    sequencerButton.getProperties().set("outlinedActiveStyle", true);
     sequencerButton.setTooltip("Show or hide the sequencer");
     sequencerButton.onClick = [this]
     {
         setSequencerOpen(sequencerButton.getToggleState());
     };
     content.addAndMakeVisible(sequencerButton);
+
+    midiLearnOverlay = std::make_unique<MidiLearnOverlay>(*this);
+    content.addChildComponent(*midiLearnOverlay);
+    midiLearnOverlay->setLearningEnabled(false);
 
     if (modeAttachment != nullptr)
         modeAttachment->sendInitialUpdate();
@@ -4180,6 +4528,8 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
 AfterglowAudioProcessorEditor::~AfterglowAudioProcessorEditor()
 {
     stopTimer();
+    processor.cancelMidiLearn();
+    processor.saveMidiMappingsIfNeeded();
     saveInterfaceSettings();
     if (presetFolderNameWindow != nullptr)
     {
@@ -4188,6 +4538,7 @@ AfterglowAudioProcessorEditor::~AfterglowAudioProcessorEditor()
         presetFolderNameWindow.reset();
     }
     content.removeMouseListener(this);
+    midiLearnOverlay.reset();
     presetFolderTree.setRootItem(nullptr);
     presetFolderRoot.reset();
     setLookAndFeel(nullptr);
@@ -4331,6 +4682,24 @@ AfterglowAudioProcessorEditor::Dial* AfterglowAudioProcessorEditor::addDial(
         {
             return restoreDialFromSavedState(*control);
         };
+    if (attachToParameter)
+        control->slider.onDefaultStateReset = [this, control]
+        {
+            auto* parameter = processor.parameters.getParameter(
+                control->parameterId);
+            if (parameter == nullptr)
+                return false;
+            control->slider.setValue(
+                parameter->convertFrom0to1(parameter->getDefaultValue()),
+                juce::sendNotificationSync);
+            information.setText(
+                "INIT DEFAULT: " + control->label.getText() + " = "
+                    + control->slider.getTextFromValue(
+                        control->slider.getValue())
+                    + "\nMiddle-click returned this parameter to its Init value.",
+                juce::dontSendNotification);
+            return true;
+        };
     control->slider.onValueChange = [this, control] {
         if (control == leftTimeDial && linkButton.getToggleState())
             synchroniseLinkedTimeControls();
@@ -4386,6 +4755,8 @@ void AfterglowAudioProcessorEditor::updateFreezeModeDisplay()
 
 void AfterglowAudioProcessorEditor::setPresetBrowserOpen(bool shouldOpen)
 {
+    if (shouldOpen && midiLearnMode)
+        setMidiLearnMode(false);
     presetBrowserOpen = shouldOpen;
     presetBrowserButton.setToggleState(shouldOpen,
                                        juce::dontSendNotification);
@@ -4428,6 +4799,7 @@ void AfterglowAudioProcessorEditor::updatePresetBrowserVisibility()
     echoOffsetLabel.setVisible(! presetBrowserOpen);
     echoOffsetSlider.setVisible(! presetBrowserOpen);
     randomButton.setVisible(! presetBrowserOpen);
+    midiLearnButton.setVisible(! presetBrowserOpen);
     mixLockButton.setVisible(! presetBrowserOpen);
     twinTapeCharacterPageButton.setVisible(
         ! presetBrowserOpen && modeBox.getSelectedId() == 20);
@@ -4472,6 +4844,30 @@ void AfterglowAudioProcessorEditor::setSequencerOpen(bool shouldOpen)
     repaint();
 }
 
+void AfterglowAudioProcessorEditor::setMidiLearnMode(bool shouldEnable)
+{
+    midiLearnMode = shouldEnable;
+    midiLearnButton.setToggleState(shouldEnable,
+                                   juce::dontSendNotification);
+    if (midiLearnOverlay != nullptr)
+    {
+        midiLearnOverlay->setBounds(content.getLocalBounds());
+        midiLearnOverlay->setLearningEnabled(shouldEnable);
+        if (shouldEnable)
+        {
+            midiLearnOverlay->toFront(false);
+            midiLearnButton.toFront(false);
+        }
+    }
+    if (shouldEnable)
+        information.setText(
+            "MIDI LEARN | Click a highlighted parameter, then move a MIDI CC.\nAssigned CC numbers are shown over controls; right-click a control to clear it.",
+            juce::dontSendNotification);
+    else
+        processor.cancelMidiLearn();
+    repaint();
+}
+
 void AfterglowAudioProcessorEditor::showLogoZoomMenu()
 {
     const int currentPercent = juce::jlimit(
@@ -4481,6 +4877,9 @@ void AfterglowAudioProcessorEditor::showLogoZoomMenu()
     constexpr std::array<int, 10> zoomChoices
         { 75, 100, 125, 150, 175, 200, 225, 250, 275, 300 };
     juce::PopupMenu menu;
+    lookAndFeel.setPopupBorderColour(
+        modeColourForId(modeBox.getSelectedId()));
+    menu.setLookAndFeel(&lookAndFeel);
     menu.addSectionHeader("GUI Zoom");
     for (const int percent : zoomChoices)
         menu.addItem(percent, juce::String(percent) + "%", true,
@@ -6191,13 +6590,23 @@ void AfterglowAudioProcessorEditor::resized()
     presetSaveButton.setBounds(870, 85, 26, 26);
     presetSaveAsButton.setBounds(870, 130, 26, 26);
     presetOpenFolderButton.setBounds(870, 175, 26, 26);
-    information.setBounds(25, 236, 670, 28);
-    echoOffsetLabel.setBounds(704, 233, 116, 11);
-    echoOffsetSlider.setBounds(704, 244, 116, 20);
+    information.setBounds(25, 236, 640, 28);
+    echoOffsetLabel.setBounds(674, 233, 116, 11);
+    echoOffsetSlider.setBounds(674, 244, 116, 20);
+    midiLearnButton.setBounds(800, 236, 26, 26);
     randomButton.setBounds(836, 236, 26, 26);
     sequencerButton.setBounds(presetBrowserOpen ? 865 : 872,
                               presetBrowserOpen ? 220 : 236,
                               36, 26);
+    if (midiLearnOverlay != nullptr)
+    {
+        midiLearnOverlay->setBounds(content.getLocalBounds());
+        if (midiLearnMode)
+        {
+            midiLearnOverlay->toFront(false);
+            midiLearnButton.toFront(false);
+        }
+    }
     if (sequencerPanel != nullptr)
         sequencerPanel->setBounds(8, collapsedDesignHeight,
                                   designWidth - 16,
@@ -6238,6 +6647,9 @@ void AfterglowAudioProcessorEditor::timerCallback()
     if (sequencerOpen && sequencerPanel != nullptr)
         sequencerPanel->timerTick();
     updateAnimatedParameterDisplays();
+    if (midiLearnOverlay != nullptr)
+        midiLearnOverlay->timerTick();
+    processor.saveMidiMappingsIfNeeded();
 
     const auto processorPresetFile = processor.getCurrentPresetFile();
     if (processorPresetFile != currentPresetFile)
