@@ -1,5 +1,15 @@
 # Afterglow — Changelog
 
+## 1.91.6 — Compact GUI Zoom Menu — 27 November 2026
+
+### Changed
+
+- Matched Dusk's GUI Zoom popup dimensions and typography: 19-pixel rows, a 75-pixel minimum width, the same popup font sizing and colour, and the same compact bold section header.
+
+### Preserved
+
+- The popup's dark background, current delay-mode border colour, zoom choices, logo anchor, interface scaling, audio processing, parameters, presets, sequencer behaviour and preset schema remain unchanged.
+
 ## 1.91.5 — Vector MIDI Icon — 26 November 2026
 
 ### Changed

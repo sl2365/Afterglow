@@ -3558,6 +3558,36 @@ void AfterglowAudioProcessorEditor::LookAndFeel::drawPopupMenuItem(
         hasSubMenu, text, shortcutKeyText, icon, textColour);
 }
 
+void AfterglowAudioProcessorEditor::LookAndFeel::drawPopupMenuSectionHeader(
+    juce::Graphics& g, const juce::Rectangle<int>& area,
+    const juce::String& sectionName)
+{
+    auto font = getPopupMenuFont();
+    const auto itemTextBounds = area.reduced(1);
+    font.setHeight(juce::jmin(
+        font.getHeight(),
+        static_cast<float>(itemTextBounds.getHeight()) / 1.3f));
+    g.setFont(font.boldened());
+    g.setColour(findColour(juce::PopupMenu::headerTextColourId));
+    g.drawFittedText(sectionName, area.reduced(12, 0),
+                     juce::Justification::centredLeft, 1, 1.0f);
+}
+
+void AfterglowAudioProcessorEditor::LookAndFeel::
+getIdealPopupMenuSectionHeaderSizeWithOptions(
+    const juce::String& text, int standardMenuItemHeight,
+    int& idealWidth, int& idealHeight,
+    const juce::PopupMenu::Options& options)
+{
+    const int rowHeight = options.getStandardItemHeight() > 0
+        ? options.getStandardItemHeight() : standardMenuItemHeight;
+    getIdealPopupMenuItemSizeWithOptions(
+        text, false, rowHeight,
+        idealWidth, idealHeight, options);
+    if (rowHeight > 0)
+        idealHeight = rowHeight;
+}
+
 void AfterglowAudioProcessorEditor::LookAndFeel::drawPopupMenuBackground(
     juce::Graphics& g, int width, int height)
 {
@@ -3609,7 +3639,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Click the Afterglow logo to choose a GUI zoom factor from 75% to 300%");
     logoMenuButton.onClick = [this] { showLogoZoomMenu(); };
     content.addAndMakeVisible(logoMenuButton);
-    versionLabel.setText("v1.91.5", juce::dontSendNotification);
+    versionLabel.setText("v1.91.6", juce::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
     versionLabel.setColour(juce::Label::textColourId, knobIndicatorColour);
     versionLabel.setFont(juce::Font(juce::FontOptions(8.5f, juce::Font::bold)));
@@ -4352,7 +4382,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
                 juce::dontSendNotification);
     };
 
-    information.setText("AFTERGLOW 1.91.5 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
+    information.setText("AFTERGLOW 1.91.6 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
     information.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
     information.setJustificationType(juce::Justification::centredLeft);
     information.setFont(juce::FontOptions(11.5f));
@@ -4889,8 +4919,12 @@ void AfterglowAudioProcessorEditor::showLogoZoomMenu()
     menu.showMenuAsync(
         juce::PopupMenu::Options()
             .withTargetComponent(&logoMenuButton)
+            .withTargetScreenArea(logoMenuButton.getScreenBounds())
             .withPreferredPopupDirection(
-                juce::PopupMenu::Options::PopupDirection::downwards),
+                juce::PopupMenu::Options::PopupDirection::downwards)
+            .withMinimumWidth(75)
+            .withMaximumNumColumns(1)
+            .withStandardItemHeight(19),
         [safeThis](int result)
         {
             if (safeThis != nullptr && result >= 75 && result <= 300)

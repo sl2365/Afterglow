@@ -187,6 +187,12 @@ private:
                                bool, bool, bool, bool, bool,
                                const juce::String&, const juce::String&,
                                const juce::Drawable*, const juce::Colour*) override;
+        void drawPopupMenuSectionHeader(
+            juce::Graphics&, const juce::Rectangle<int>&,
+            const juce::String&) override;
+        void getIdealPopupMenuSectionHeaderSizeWithOptions(
+            const juce::String&, int, int&, int&,
+            const juce::PopupMenu::Options&) override;
         void drawPopupMenuBackground(juce::Graphics&, int, int) override;
         juce::PopupMenu::Options getOptionsForComboBoxPopupMenu(
             juce::ComboBox&, juce::Label&) override;
