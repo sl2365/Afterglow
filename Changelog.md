@@ -1,5 +1,16 @@
 # Afterglow — Changelog
 
+## 1.91.8 — 75% GUI Zoom Fix — 27 November 2026
+
+### Fixed
+
+- Fixed the expanded 75% interface being cut off by a stale 414-pixel minimum height inherited from the earlier 552-pixel sequencer layout. The current 530-pixel expanded design can now use its correct approximately 398-pixel height.
+- Derived minimum and maximum resize limits from the active collapsed or expanded design dimensions and the supported 75–300% range. Integer-pixel rounding is allowed at the 75% boundary, preventing the host and JUCE constrainer from fighting the requested size.
+
+### Preserved
+
+- Interface layout, fixed aspect ratio, compact GUI Zoom menu, logo click area, audio processing, parameters, presets, sequencer behaviour and preset schema remain unchanged.
+
 ## 1.91.7 — Exact Logo Click Area — 27 November 2026
 
 ### Fixed

@@ -3639,7 +3639,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Click the Afterglow logo to choose a GUI zoom factor from 75% to 300%");
     logoMenuButton.onClick = [this] { showLogoZoomMenu(); };
     content.addAndMakeVisible(logoMenuButton);
-    versionLabel.setText("v1.91.7", juce::dontSendNotification);
+    versionLabel.setText("v1.91.8", juce::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
     versionLabel.setColour(juce::Label::textColourId, knobIndicatorColour);
     versionLabel.setFont(juce::Font(juce::FontOptions(8.5f, juce::Font::bold)));
@@ -4382,7 +4382,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
                 juce::dontSendNotification);
     };
 
-    information.setText("AFTERGLOW 1.91.7 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
+    information.setText("AFTERGLOW 1.91.8 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
     information.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
     information.setJustificationType(juce::Justification::centredLeft);
     information.setFont(juce::FontOptions(11.5f));
@@ -4539,12 +4539,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
     updateModeControlState();
     updatePresetNavigationDisplay();
     setResizable(true, true);
-    setResizeLimits(695, sequencerOpen ? 414 : 207,
-                    2778, sequencerOpen ? 1656 : 828);
-    if (auto* editorConstrainer = getConstrainer())
-        editorConstrainer->setFixedAspectRatio(
-            static_cast<double>(designWidth)
-                / static_cast<double>(activeDesignHeight()));
+    updateEditorResizeLimits();
     setSize(juce::roundToInt(static_cast<float>(designWidth)
                              * static_cast<float>(storedSettings.scalePercent) * 0.01f),
             juce::roundToInt(static_cast<float>(activeDesignHeight())
@@ -4861,17 +4856,25 @@ void AfterglowAudioProcessorEditor::setSequencerOpen(bool shouldOpen)
     sequencerButton.setToggleState(shouldOpen, juce::dontSendNotification);
     if (sequencerPanel != nullptr)
         sequencerPanel->setVisible(shouldOpen);
-    if (auto* editorConstrainer = getConstrainer())
-        editorConstrainer->setFixedAspectRatio(
-            static_cast<double>(designWidth)
-                / static_cast<double>(activeDesignHeight()));
-    setResizeLimits(695, shouldOpen ? 414 : 207,
-                    2778, shouldOpen ? 1656 : 828);
+    updateEditorResizeLimits();
     setSize(juce::roundToInt(static_cast<float>(designWidth) * scale),
             juce::roundToInt(static_cast<float>(activeDesignHeight()) * scale));
     saveInterfaceSettings();
     resized();
     repaint();
+}
+
+void AfterglowAudioProcessorEditor::updateEditorResizeLimits()
+{
+    const int designHeight = activeDesignHeight();
+    // Round the minimum down so JUCE and the host can represent the 75%
+    // dimensions when the scaled design lands between integer pixels.
+    if (auto* editorConstrainer = getConstrainer())
+        editorConstrainer->setFixedAspectRatio(
+            static_cast<double>(designWidth)
+                / static_cast<double>(designHeight));
+    setResizeLimits(designWidth * 3 / 4, designHeight * 3 / 4,
+                    designWidth * 3, designHeight * 3);
 }
 
 void AfterglowAudioProcessorEditor::setMidiLearnMode(bool shouldEnable)

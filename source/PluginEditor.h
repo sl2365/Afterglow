@@ -314,6 +314,7 @@ private:
     void selectFavouritePresets();
     void refreshPresetList();
     void updatePresetNavigationDisplay();
+    void updateEditorResizeLimits();
     void setSequencerOpen(bool);
     void setMidiLearnMode(bool);
     void updateSequencerTargetHighlights();
