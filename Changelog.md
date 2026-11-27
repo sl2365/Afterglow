@@ -1,5 +1,15 @@
 # Afterglow — Changelog
 
+## 1.91.7 — Exact Logo Click Area — 27 November 2026
+
+### Fixed
+
+- Restricted the invisible GUI Zoom click target to the actual aspect-fitted width of the displayed logo. Empty header space to the right of the artwork no longer opens the zoom menu.
+
+### Preserved
+
+- The logo's image, size and position, compact GUI Zoom menu, zoom behaviour, audio processing, parameters, presets, sequencer behaviour and preset schema remain unchanged.
+
 ## 1.91.6 — Compact GUI Zoom Menu — 27 November 2026
 
 ### Changed

@@ -3639,7 +3639,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Click the Afterglow logo to choose a GUI zoom factor from 75% to 300%");
     logoMenuButton.onClick = [this] { showLogoZoomMenu(); };
     content.addAndMakeVisible(logoMenuButton);
-    versionLabel.setText("v1.91.6", juce::dontSendNotification);
+    versionLabel.setText("v1.91.7", juce::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
     versionLabel.setColour(juce::Label::textColourId, knobIndicatorColour);
     versionLabel.setFont(juce::Font(juce::FontOptions(8.5f, juce::Font::bold)));
@@ -4382,7 +4382,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
                 juce::dontSendNotification);
     };
 
-    information.setText("AFTERGLOW 1.91.6 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
+    information.setText("AFTERGLOW 1.91.7 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
     information.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
     information.setJustificationType(juce::Justification::centredLeft);
     information.setFont(juce::FontOptions(11.5f));
@@ -6585,7 +6585,17 @@ void AfterglowAudioProcessorEditor::resized()
     placeDial(12, 845, 67);  // Dry / Wet
     placeDial(15, 845, 154); // Output
 
-    logoMenuButton.setBounds(22, 5, 280, 43);
+    int logoClickWidth = 280;
+    if (logoImage.isValid())
+    {
+        const float logoScale = juce::jmin(
+            1.0f,
+            juce::jmin(280.0f / static_cast<float>(logoImage.getWidth()),
+                       43.0f / static_cast<float>(logoImage.getHeight())));
+        logoClickWidth = juce::roundToInt(
+            static_cast<float>(logoImage.getWidth()) * logoScale);
+    }
+    logoMenuButton.setBounds(22, 5, logoClickWidth, 43);
     versionLabel.setBounds(designWidth - 65, 2, 66, 12);
     modeLabel.setBounds(204, 17, 38, 20);
     modeBox.setBounds(242, 13, 100, 26);
