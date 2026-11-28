@@ -93,11 +93,13 @@ private:
 
             lastWheelDirection = direction;
             lastWheelTimeMs = now;
-            const int currentIndex = juce::jmax(0, getSelectedItemIndex());
-            const int nextIndex = juce::jlimit(0, getNumItems() - 1,
-                                                currentIndex + direction);
-            if (nextIndex != getSelectedItemIndex())
-                setSelectedItemIndex(nextIndex, juce::sendNotificationSync);
+            const int selected = getSelectedItemIndex();
+            const int current = selected >= 0 ? selected
+                : (direction > 0 ? -1 : getNumItems());
+            const int next = juce::jlimit(
+                0, getNumItems() - 1, current + direction);
+            if (next != selected)
+                setSelectedItemIndex(next, juce::sendNotificationSync);
         }
 
     private:

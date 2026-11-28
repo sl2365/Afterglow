@@ -1,5 +1,17 @@
 # Afterglow — Changelog
 
+## 1.91.9 — Sequencer Menu Scrolling — 28 November 2026
+
+### Fixed
+
+- Changed WAVEFORM and USER to the same confirmed one-step mouse-wheel implementation used by Dusk. Every accepted wheel movement now advances exactly one entry instead of skipping or returning to the beginning.
+- Kept the selected waveform visible after it is applied, allowing subsequent wheel movements to continue from that waveform rather than restarting at the first option.
+- When either selector still shows its placeholder, the first downward wheel movement selects the first entry and the first upward movement selects the final entry.
+
+### Preserved
+
+- Waveform generation, saved user sequences, DIRECTION behaviour, sequencer patterns, audio processing, parameters, presets and preset schema remain unchanged.
+
 ## 1.91.8 — 75% GUI Zoom Fix — 27 November 2026
 
 ### Fixed

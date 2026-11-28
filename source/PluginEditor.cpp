@@ -1828,12 +1828,12 @@ public:
             if (selected >= 0)
                 grid.applyWaveform(
                     static_cast<afterglow::sequencer::Waveform>(selected));
-            waveformBox.setSelectedId(0, juce::dontSendNotification);
         };
 
         directionBox.addItemList(
             { "Loop", "Bounce", "Reverse", "Played", "Random" }, 1);
-        for (auto* box : { &waveformBox, &userSequenceBox, &directionBox })
+        for (auto* box : std::array<juce::ComboBox*, 3>
+             {{ &waveformBox, &userSequenceBox, &directionBox }})
         {
             box->setJustificationType(juce::Justification::centred);
             box->setColour(juce::ComboBox::backgroundColourId,
@@ -2631,8 +2631,8 @@ private:
     juce::ToggleButton animateButton;
     juce::ToggleButton gateModeButton;
     juce::ToggleButton rangeLinkButton;
-    juce::ComboBox waveformBox;
-    juce::ComboBox userSequenceBox;
+    SteppedComboBox waveformBox;
+    SteppedComboBox userSequenceBox;
     juce::ComboBox directionBox;
     juce::ToggleButton nudgeLeft;
     juce::ToggleButton nudgeRight;
@@ -3639,7 +3639,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
         "Click the Afterglow logo to choose a GUI zoom factor from 75% to 300%");
     logoMenuButton.onClick = [this] { showLogoZoomMenu(); };
     content.addAndMakeVisible(logoMenuButton);
-    versionLabel.setText("v1.91.8", juce::dontSendNotification);
+    versionLabel.setText("v1.91.9", juce::dontSendNotification);
     versionLabel.setJustificationType(juce::Justification::centred);
     versionLabel.setColour(juce::Label::textColourId, knobIndicatorColour);
     versionLabel.setFont(juce::Font(juce::FontOptions(8.5f, juce::Font::bold)));
@@ -4382,7 +4382,7 @@ AfterglowAudioProcessorEditor::AfterglowAudioProcessorEditor(AfterglowAudioProce
                 juce::dontSendNotification);
     };
 
-    information.setText("AFTERGLOW 1.91.8 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
+    information.setText("AFTERGLOW 1.91.9 | Drag a parameter label onto the sequencer target list\nSEQ opens or closes the modulation panel without disturbing the delay layout.", juce::dontSendNotification);
     information.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
     information.setJustificationType(juce::Justification::centredLeft);
     information.setFont(juce::FontOptions(11.5f));
